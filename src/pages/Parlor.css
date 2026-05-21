@@ -1,0 +1,1523 @@
+/* ═══════════════════════════════════════════
+   THE PARLOUR — Victorian Tavern
+   ═══════════════════════════════════════════ */
+
+/* ── Page shell ── */
+.parlor-page {
+  min-height: calc(100vh - var(--bottom-bar-height));
+  background: radial-gradient(ellipse at top, #3A1E0A 0%, #2C1810 55%, #1A0E06 100%);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body);
+}
+
+@keyframes parlor-fade-anim {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.parlor-fade { animation: parlor-fade-anim 0.28s ease; }
+
+/* ── Header ── */
+.parlor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 52px;
+  flex-shrink: 0;
+  background: var(--walnut);
+  border-bottom: 2px solid var(--brass);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+.parlor-back-btn {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--parchment);
+  background: transparent;
+  border: 1px solid rgba(196,154,60,0.3);
+  border-radius: 6px;
+  padding: 5px 14px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.parlor-back-btn:hover {
+  color: var(--aged-gold);
+  border-color: var(--aged-gold);
+  background: rgba(196,154,60,0.1);
+}
+
+.parlor-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+.parlor-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.parlor-coins {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  min-width: 80px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Scholar's Note cipher modal ── */
+.scholar-note-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scholar-note-panel {
+  background: #FFF8E7;
+  border: 1.5px solid #8B6914;
+  border-radius: 8px;
+  padding: 24px 26px 20px;
+  width: min(320px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.scholar-note-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: #2C1810;
+  text-align: center;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.scholar-note-flavour {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #5C3A1E;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.scholar-note-input {
+  background: #FFFDF5;
+  border: 1px solid #C49A3C;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  color: #2C1810;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.scholar-note-input:focus {
+  border-color: #8B6914;
+  box-shadow: 0 0 0 2px rgba(196, 154, 60, 0.18);
+}
+
+.scholar-note-submit {
+  background: #5C3A1E;
+  border: 1px solid #8B6914;
+  border-radius: 5px;
+  color: #E8C9A0;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  padding: 8px 20px;
+  cursor: pointer;
+  align-self: flex-end;
+  transition: background 0.15s, color 0.15s;
+}
+
+.scholar-note-submit:hover {
+  background: #8B6914;
+  color: #FFF8E7;
+}
+
+/* ── Main overview ── */
+.parlor-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px calc(var(--bottom-bar-height) + 20px);
+}
+
+.parlor-tagline {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--parchment);
+  text-align: center;
+  opacity: 0.7;
+  margin-bottom: 18px;
+  padding: 0 4px;
+}
+
+/* ── Notice board ── */
+.parlor-notice-board {
+  background: #221208;
+  border: 2px solid var(--brass);
+  border-radius: 10px;
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.parlor-notice-label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--aged-gold);
+  background: var(--walnut);
+  padding: 5px 14px;
+  border-bottom: 1px solid rgba(139,105,20,0.4);
+}
+
+.parlor-notice-scroll {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.parlor-notice-scroll::-webkit-scrollbar { display: none; }
+
+.parlor-notice-pin {
+  flex-shrink: 0;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--parchment);
+  background: rgba(232,201,160,0.06);
+  border: 1px solid rgba(196,154,60,0.18);
+  border-radius: 6px;
+  padding: 6px 10px;
+  max-width: 210px;
+  line-height: 1.4;
+}
+
+/* ── Encouragement banner (Elias milestone message) ── */
+@keyframes encourage-glow {
+  from { box-shadow: 0 0 10px rgba(196, 154, 60, 0.2); }
+  to   { box-shadow: 0 0 22px rgba(196, 154, 60, 0.5); }
+}
+
+.parlor-encouragement {
+  background: linear-gradient(135deg, #3D2010, #2C1810);
+  border: 1.5px solid #C49A3C;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+  animation: encourage-glow 2s ease-in-out infinite alternate;
+}
+
+.parlor-encourage-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+.parlor-encourage-text {
+  color: #E8C9A0;
+  font-size: 0.9rem;
+  font-family: Georgia, serif;
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.parlor-encourage-text strong {
+  font-style: normal;
+  color: #C49A3C;
+}
+
+.parlor-encourage-dismiss {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #8B6914;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+/* ── Zone rows ── */
+.parlor-zone-row {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.parlor-zone-row--top     { grid-template-columns: repeat(3, 1fr); }
+.parlor-zone-row--alcoves { grid-template-columns: 1fr 1fr; }
+
+.parlor-zone-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(160deg, #3D1F0A, #2A1608);
+  border: 1px solid rgba(139,105,20,0.4);
+  border-radius: 12px;
+  padding: 14px 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.parlor-zone-card:hover {
+  border-color: var(--aged-gold);
+  background: linear-gradient(160deg, #4A2610, #331A08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.parlor-zone-card--alcove {
+  background: linear-gradient(160deg, #28120A, #1E0E06);
+  border-style: dashed;
+}
+.parlor-zone-card--empty {
+  opacity: 0.5;
+  cursor: default;
+}
+.parlor-zone-card--empty:hover { transform: none; box-shadow: none; border-color: rgba(139,105,20,0.4); }
+
+.pzc-icon  { font-size: 1.9rem; }
+.pzc-label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+}
+.pzc-npc {
+  font-size: 0.76rem;
+  color: var(--leather);
+}
+.pzc-desc {
+  font-style: italic;
+  font-size: 0.68rem;
+  color: var(--parchment);
+  opacity: 0.55;
+  line-height: 1.3;
+}
+
+/* ── Zone view wrapper ── */
+.parlor-zone-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-bottom: calc(var(--bottom-bar-height) + 20px);
+}
+.parlor-zone-view--bar {
+  background: linear-gradient(180deg, rgba(74,40,16,0.25) 0%, transparent 35%);
+}
+.parlor-zone-view--alcove {
+  background: radial-gradient(ellipse at top, rgba(40,18,10,0.5) 0%, transparent 55%);
+}
+.parlor-zone-view--mystery {
+  background: radial-gradient(ellipse at top, rgba(60,18,56,0.25) 0%, transparent 50%);
+}
+
+/* ── Scene header (NPC display area) ── */
+.parlor-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px 4px;
+  gap: 10px;
+}
+.parlor-scene--alcove {
+  position: relative;
+}
+.parlor-scene--mystery {
+  background: radial-gradient(ellipse at center, rgba(74,25,66,0.18) 0%, transparent 70%);
+  border-radius: 16px;
+  margin: 8px;
+  padding-top: 24px;
+}
+
+/* ── Bar counter ── */
+.parlor-bar-counter {
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(180deg, #4A2810, #2A1608);
+  border: 2px solid var(--brass);
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+.parlor-bar-bottles {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  padding: 12px 16px 8px;
+}
+.parlor-bottle { font-size: 1.6rem; }
+.parlor-bar-plank {
+  height: 14px;
+  background: linear-gradient(180deg, #7A4820, #5C3A1E);
+  border-top: 2px solid var(--brass);
+}
+
+/* ── Scholar books ── */
+.parlor-scholar-books {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+/* ── Alcove candle ── */
+.parlor-alcove-candle {
+  font-size: 2.6rem;
+  filter: drop-shadow(0 0 8px rgba(196,154,60,0.5));
+}
+
+/* ── Mystery glow ── */
+.parlor-mystery-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 60%, rgba(74,25,66,0.3) 0%, transparent 70%);
+  pointer-events: none;
+  animation: mystery-pulse 3s ease-in-out infinite alternate;
+  border-radius: 16px;
+}
+@keyframes mystery-pulse {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+
+/* ── NPC figure ── */
+.parlor-npc-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.parlor-npc-avatar {
+  font-size: 3.2rem;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(196,154,60,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.parlor-npc-avatar--sm  { font-size: 2.4rem; width: 52px; height: 52px; }
+.parlor-npc-avatar--mystery {
+  filter: drop-shadow(0 0 8px rgba(150,0,200,0.35));
+}
+.parlor-npc-name {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+}
+.parlor-npc-role {
+  font-style: italic;
+  font-size: 0.76rem;
+  color: var(--leather);
+}
+
+/* ── NPC dialogue panel ── */
+.parlor-npc-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px 16px 16px;
+  gap: 10px;
+}
+
+.parlor-npc-bubble {
+  background: linear-gradient(160deg, #3D2010, #2A1608);
+  border: 1px solid rgba(196,154,60,0.35);
+  border-radius: 14px;
+  padding: 18px 20px;
+  min-height: 88px;
+  cursor: pointer;
+  position: relative;
+}
+
+.parlor-npc-text {
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--parchment);
+  line-height: 1.65;
+  white-space: pre-line;
+}
+.parlor-npc-cursor {
+  display: inline-block;
+  color: var(--aged-gold);
+  animation: cursor-blink 0.9s step-end infinite;
+  margin-left: 1px;
+}
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.parlor-npc-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+.parlor-npc-progress {
+  font-size: 0.76rem;
+  color: var(--leather);
+  opacity: 0.65;
+}
+.parlor-npc-btn {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--dark-oak);
+  background: linear-gradient(135deg, var(--aged-gold), var(--brass));
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: filter 0.18s;
+}
+.parlor-npc-btn:hover { filter: brightness(1.1); }
+
+/* ── Merchant top ── */
+.parlor-merchant-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px 8px;
+}
+
+.parlor-merchant-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.parlor-mira-quip {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--leather);
+  opacity: 0.85;
+  margin-top: 3px;
+}
+
+.parlor-restock-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(196,154,60,0.25);
+  border-radius: 8px;
+  padding: 6px 10px;
+  flex-shrink: 0;
+  align-self: center;
+  min-width: 64px;
+  text-align: center;
+}
+
+.parlor-restock-badge--ready {
+  border-color: rgba(100,180,100,0.3);
+}
+
+.parlor-restock-label {
+  font-family: var(--font-ui);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  opacity: 0.45;
+}
+
+.parlor-restock-time {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.04em;
+}
+
+.parlor-restock-badge--ready .parlor-restock-time {
+  color: #7fbf7f;
+}
+
+/* ── Tabs ── */
+.parlor-tabs {
+  display: flex;
+  margin: 0 16px 14px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 8px;
+  padding: 3px;
+}
+.parlor-tab {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--leather);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 7px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.parlor-tab--on {
+  color: var(--dark-oak);
+  background: linear-gradient(135deg, var(--aged-gold), var(--brass));
+}
+
+/* ── Mira sell-capacity banner ── */
+.parlor-sell-cap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 14px 10px;
+  padding: 9px 13px;
+  background: rgba(196,154,60,0.08);
+  border: 1px solid rgba(196,154,60,0.25);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--parchment);
+  line-height: 1.4;
+}
+
+.parlor-sell-cap--full {
+  background: rgba(139,37,0,0.12);
+  border-color: rgba(139,37,0,0.3);
+}
+
+.parlor-sell-cap-icon { font-size: 1rem; flex-shrink: 0; }
+
+.parlor-sell-cap strong { color: var(--aged-gold); }
+.parlor-sell-cap--full strong { color: #c87050; }
+
+/* ── Card grid ── */
+.parlor-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+
+.parlor-empty {
+  grid-column: 1 / -1;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--parchment);
+  opacity: 0.6;
+  text-align: center;
+  padding: 24px;
+}
+
+/* ── Mini creature card (pmc) ── */
+.pmc {
+  background: linear-gradient(160deg, #E8C9A0, #D4A574);
+  border: 2px solid var(--type-color, #8B6914);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.pmc-header {
+  background: var(--type-color, #5C3A1E);
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pmc-name {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.04em;
+}
+.pmc-type { font-size: 1rem; }
+
+/* Creature image in buy card */
+.pmc-img-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--parchment);
+  flex-shrink: 0;
+}
+
+.pmc-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Level + stars badge */
+.pmc-level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px 2px;
+  background: rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.pmc-level-tag {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--type-color, var(--walnut));
+  letter-spacing: 0.06em;
+}
+
+.pmc-stars {
+  font-size: 0.65rem;
+  color: var(--aged-gold);
+  letter-spacing: 0.05em;
+}
+
+.pmc-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 6px 8px;
+}
+.pmc-stats span {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  color: var(--dark-oak);
+  background: rgba(44,24,16,0.1);
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+
+.pmc-btn {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--dark-oak);
+  background: linear-gradient(135deg, var(--aged-gold), var(--brass));
+  border: none;
+  margin: 0 8px 8px;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  transition: filter 0.18s;
+}
+.pmc-btn:hover:not(:disabled) { filter: brightness(1.1); }
+.pmc-btn--disabled { opacity: 0.4; cursor: not-allowed; }
+.pmc-btn--sell {
+  background: linear-gradient(135deg, #7A4820, #5C3A1E);
+  color: var(--parchment);
+}
+
+/* ── Toast ── */
+.parlor-toast {
+  position: fixed;
+  bottom: calc(var(--bottom-bar-height) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--walnut), #2A1608);
+  border: 1px solid var(--aged-gold);
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--aged-gold);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  z-index: 99;
+  pointer-events: none;
+  animation: toast-in 0.25s ease, toast-out 0.25s ease 1.95s forwards;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes toast-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Mira's sell-confirmation dialog ── */
+.mira-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 10, 4, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+  animation: parlor-fade-anim 0.2s ease;
+}
+
+.mira-dialog {
+  background: linear-gradient(160deg, #3D2010, #271408);
+  border: 2px solid var(--brass);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.7);
+}
+
+.mira-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(139,105,20,0.3);
+}
+
+.mira-dialog-identity { display: flex; flex-direction: column; gap: 1px; }
+
+.mira-dialog-bubble {
+  background: rgba(0,0,0,0.2);
+  margin: 12px 14px;
+  border: 1px solid rgba(196,154,60,0.25);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.mira-dialog-line {
+  font-family: Georgia, var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--parchment);
+  line-height: 1.6;
+}
+
+.mira-dialog-quality {
+  margin: 0 14px 8px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--aged-gold);
+  text-align: center;
+}
+
+.mira-dialog-offer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(139,105,20,0.2);
+}
+
+.mira-dialog-creature {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.04em;
+}
+
+.mira-dialog-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.mira-dialog-price-label {
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--leather);
+  opacity: 0.7;
+}
+
+.mira-dialog-price-value {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+}
+
+.mira-dialog-actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 14px 16px;
+}
+
+.mira-dialog-btn {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border: none;
+  border-radius: 10px;
+  padding: 11px;
+  cursor: pointer;
+  transition: filter 0.18s;
+}
+.mira-dialog-btn:hover { filter: brightness(1.1); }
+
+.mira-dialog-btn--sell {
+  background: linear-gradient(135deg, var(--aged-gold), var(--brass));
+  color: var(--dark-oak);
+}
+
+.mira-dialog-btn--keep {
+  background: rgba(255,255,255,0.08);
+  color: var(--leather);
+  border: 1px solid rgba(196,154,60,0.25);
+}
+
+/* ── Mira's two-section shop layout ── */
+.mira-shop-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mira-shop-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Wooden shelf plank — sits between Mira's Finds and Your Old Friends */
+.mira-shelf-divider {
+  height: 14px;
+  margin: 14px 0 0;
+  background: linear-gradient(180deg, #8B5A2B 0%, #6B4220 40%, #4A2810 100%);
+  border-top: 2px solid var(--aged-gold);
+  border-bottom: 3px solid rgba(0,0,0,0.45);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  position: relative;
+}
+/* Brass knot-hole details on the plank */
+.mira-shelf-divider::before,
+.mira-shelf-divider::after {
+  content: '✦';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.5rem;
+  color: var(--aged-gold);
+  opacity: 0.55;
+}
+.mira-shelf-divider::before { left: 14px; }
+.mira-shelf-divider::after  { right: 14px; }
+
+/* Your Old Friends — distinct dark display-case look */
+.mira-shop-section--buyback {
+  margin-top: 0;
+  padding-bottom: 8px;
+  background: linear-gradient(180deg, rgba(26,14,6,0.7) 0%, rgba(20,10,4,0.5) 100%);
+  border-left: 3px solid rgba(196,154,60,0.35);
+  border-right: 3px solid rgba(196,154,60,0.35);
+  border-bottom: 3px solid rgba(196,154,60,0.35);
+  border-radius: 0 0 10px 10px;
+}
+
+.mira-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px 6px;
+}
+
+/* Override section header inside the buyback zone — dark wood placard */
+.mira-shop-section--buyback .mira-section-header {
+  background: linear-gradient(135deg, #4A2810 0%, #2C1810 100%);
+  border-bottom: 1px solid rgba(196,154,60,0.4);
+  padding: 10px 14px;
+  margin-bottom: 4px;
+}
+
+.mira-section-title {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--aged-gold);
+  text-transform: uppercase;
+}
+
+/* Larger, more prominent title in the buyback placard */
+.mira-shop-section--buyback .mira-section-title {
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.mira-section-note {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  color: var(--leather);
+  opacity: 0.7;
+}
+
+/* Style the count badge in the buyback header */
+.mira-shop-section--buyback .mira-section-note {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(196,154,60,0.3);
+  border-radius: 10px;
+  padding: 2px 8px;
+  opacity: 0.9;
+}
+
+/* ── Gone to Market parchment sign ── */
+.mira-empty-table {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px 20px;
+}
+
+.mira-gone-sign {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(160deg, #F5E8C8, #E8C9A0);
+  border: 2px solid var(--brass);
+  border-radius: 12px;
+  padding: 20px 32px 18px;
+  max-width: 240px;
+  width: 100%;
+  text-align: center;
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  position: relative;
+}
+
+/* Tack/pin at the top of the sign */
+.mira-gone-sign::before {
+  content: '📌';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+}
+
+.mira-gone-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(139,105,20,0.4));
+  margin-bottom: 2px;
+}
+
+.mira-gone-text {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark-oak);
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.mira-gone-sub {
+  font-family: Georgia, var(--font-body);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--walnut);
+  opacity: 0.75;
+  margin: 0;
+}
+
+.mira-restock-countdown {
+  margin-top: 6px;
+  background: var(--walnut);
+  border-radius: 20px;
+  padding: 3px 14px;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+/* ── Mini card — buyback & selection states ── */
+.pmc--buyback {
+  background: linear-gradient(160deg, #EEE0A0, #D4B860);
+  border-color: var(--aged-gold);
+  border-width: 2px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+}
+
+.pmc--selected {
+  outline: 2px solid var(--aged-gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(196,154,60,0.18);
+}
+
+.pmc-buyback-ribbon {
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--dark-oak);
+  background: linear-gradient(90deg, var(--aged-gold), #e8b830);
+  text-align: center;
+  padding: 2px 8px;
+  border-bottom: 1px solid rgba(139,105,20,0.3);
+}
+
+.pmc-btn--buyback {
+  background: linear-gradient(135deg, #c9a020, #a07810);
+  color: var(--cream);
+}
+.pmc-btn--buyback:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+/* ── Sell dialog — buyback shelf full warning ── */
+.mira-dialog-shelf-warn {
+  margin: 0 14px 10px;
+  padding: 8px 12px;
+  background: rgba(139,37,0,0.1);
+  border: 1px solid rgba(139,37,0,0.3);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: #c87050;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 380px) {
+  .parlor-zone-row--top     { grid-template-columns: 1fr 1fr; }
+  .parlor-card-grid         { grid-template-columns: 1fr; }
+}
+
+
+/* ══════════════════════════════════════════════
+   DEVELOPER CONSOLE — secret Scholar 5-tap overlay
+   ══════════════════════════════════════════════ */
+
+.dev-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 2, 0, 0.92);
+  z-index: 500;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.dev-panel {
+  width: 100%;
+  max-width: 480px;
+  background: var(--cream);
+  border-radius: 8px;
+  border: 2px solid var(--walnut);
+  outline: 3px solid var(--leather);
+  outline-offset: -1px;
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  margin: auto;
+}
+
+/* Header */
+.dev-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--walnut);
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--brass);
+}
+
+.dev-title {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+}
+
+.dev-close {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(196,154,60,0.35);
+  border-radius: 4px;
+  color: var(--parchment);
+  font-size: 0.88rem;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dev-close:hover { background: rgba(255,255,255,0.16); }
+
+/* Toast */
+.dev-toast {
+  background: var(--walnut);
+  color: var(--aged-gold);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 6px 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(196,154,60,0.3);
+}
+
+/* Section wrapper */
+.dev-section {
+  padding: 14px 16px 16px;
+  border-bottom: 1px solid rgba(92, 58, 30, 0.15);
+}
+.dev-section:last-child { border-bottom: none; }
+
+.dev-section-label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--brass);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* Input fields */
+.dev-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.dev-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--walnut);
+}
+
+.dev-field span { flex: 1; }
+
+.dev-input {
+  width: 80px;
+  padding: 4px 8px;
+  border: 1px solid rgba(92, 58, 30, 0.4);
+  border-radius: 4px;
+  background: var(--linen);
+  color: var(--dark-oak);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  text-align: right;
+}
+.dev-input:focus {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+}
+
+/* Buttons */
+.dev-btn {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  background: linear-gradient(135deg, var(--brass), var(--aged-gold));
+  color: var(--dark-oak);
+  border: 1px solid var(--aged-gold);
+  width: 100%;
+}
+.dev-btn:hover { filter: brightness(1.08); }
+.dev-btn:active { transform: translateY(1px); }
+
+/* Story flags grid */
+.dev-flags {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dev-flag-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(92, 58, 30, 0.2);
+  background: rgba(92, 58, 30, 0.04);
+  color: var(--walnut);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s, border-color 0.12s;
+  width: 100%;
+}
+.dev-flag-btn:hover {
+  background: rgba(92, 58, 30, 0.09);
+  border-color: rgba(92, 58, 30, 0.35);
+}
+.dev-flag-btn--on {
+  background: rgba(139, 105, 20, 0.12);
+  border-color: var(--aged-gold);
+  color: var(--dark-oak);
+}
+
+.dev-flag-dot {
+  font-size: 0.7rem;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--brass);
+}
+.dev-flag-btn--on .dev-flag-dot { color: var(--aged-gold); }
+
+/* Audio info row (current volume display) */
+.dev-audio-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--walnut);
+  font-weight: 600;
+}
+
+/* Scenario buttons */
+.dev-scenarios {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dev-btn--scenario {
+  background: rgba(92, 58, 30, 0.07);
+  color: var(--walnut);
+  border: 1px solid rgba(92, 58, 30, 0.22);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: left;
+  padding: 7px 12px;
+}
+.dev-btn--scenario:hover {
+  background: rgba(92, 58, 30, 0.12);
+  border-color: rgba(92, 58, 30, 0.4);
+  filter: none;
+}
+
+/* Danger zone */
+.dev-section--danger { background: rgba(139, 37, 0, 0.04); }
+
+.dev-section--danger .dev-section-label { color: #B03010; }
+
+.dev-danger-note {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--walnut);
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.dev-btn--reset {
+  background: linear-gradient(135deg, #8B2500, #C62828);
+  color: var(--cream);
+  border-color: #8B2500;
+}
+.dev-btn--reset:hover { filter: brightness(1.1); }
+
+.dev-danger-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dev-danger-confirm-text {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: #8B2500;
+  font-weight: 600;
+}
+
+.dev-btn--cancel {
+  background: rgba(44, 24, 16, 0.07);
+  color: var(--walnut);
+  border: 1px solid rgba(92, 58, 30, 0.3);
+}
+
+
+/* ══════════════════════════════════════════════
+   MIRA BULLY QUEST
+   ══════════════════════════════════════════════ */
+
+/* ❗ badge on zone card — only shows when quest is available */
+@keyframes quest-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px #FFF8E7,
+      0 0 12px 4px rgba(230, 57, 70, 0.8),
+      0 0 24px 8px rgba(230, 57, 70, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px #FFF8E7,
+      0 0 20px 8px rgba(230, 57, 70, 1.0),
+      0 0 40px 16px rgba(230, 57, 70, 0.5);
+    transform: scale(1.15);
+  }
+}
+
+.pzc-quest-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #E63946;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: quest-pulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Quest-tone quip in Mira's header — slightly warmer/more urgent than normal */
+.parlor-mira-quip--quest {
+  color: #C87050;
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Two-button row rendered by NpcPanel's lastActions when quest choices appear */
+.parlor-npc-actions {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.parlor-npc-actions .parlor-npc-btn {
+  flex: 1;
+  max-width: 160px;
+  font-size: 0.75rem;
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+
+/* ── Suggestion Box ── */
+
+.parlor-feedback-btn {
+  display: block;
+  margin: 8px auto 0;
+  padding: 6px 16px;
+  background: #FFF8E7;
+  border: 1px solid #D4A574;
+  border-radius: 6px;
+  font: italic 13px Georgia, serif;
+  color: #5C3A1E;
+  cursor: pointer;
+}
+.parlor-feedback-btn:hover { background: #F5F0E1; }
+.parlor-feedback-btn:disabled { opacity: 0.5; cursor: default; }
+
+.feedback-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.feedback-panel {
+  background: #FFF8E7;
+  border: 2px solid #D4A574;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px; width: 100%;
+  text-align: center;
+}
+.feedback-title { font: bold 20px Georgia, serif; color: #2C1810; margin: 0 0 4px; }
+.feedback-subtitle { font: italic 14px Georgia, serif; color: #8B6914; margin: 0 0 8px; }
+.feedback-divider { color: #D4A574; margin: 8px 0 16px; }
+.feedback-label { display: block; text-align: left; font: 13px Georgia, serif; color: #5C3A1E; margin: 0 0 4px; }
+.feedback-opt { color: #8B6914; font-size: 11px; }
+.feedback-input, .feedback-textarea {
+  width: 100%; padding: 8px 10px; margin: 0 0 12px;
+  border: 1px solid #D4A574; border-radius: 6px;
+  background: #F5F0E1; font: 14px Georgia, serif; color: #2C1810;
+  box-sizing: border-box;
+}
+.feedback-textarea { resize: vertical; }
+.feedback-rating-row { display: flex; gap: 6px; margin: 0 0 16px; }
+.feedback-rating-btn {
+  flex: 1; padding: 6px 4px; border: 1px solid #D4A574; border-radius: 6px;
+  background: #F5F0E1; font: 12px Georgia, serif; color: #5C3A1E; cursor: pointer;
+}
+.feedback-rating-btn--on { background: #C49A3C; color: #FFF8E7; border-color: #8B6914; }
+.feedback-error { color: #8B2500; font: italic 13px Georgia, serif; margin: 0 0 8px; }
+.feedback-send-btn {
+  width: 100%; padding: 10px; margin: 4px 0;
+  background: #8B6914; color: #FFF8E7; border: none; border-radius: 8px;
+  font: bold 15px Georgia, serif; cursor: pointer;
+}
+.feedback-send-btn:hover { background: #C49A3C; }
+.feedback-send-btn:disabled { opacity: 0.5; cursor: default; }
+.feedback-cancel-btn {
+  background: none; border: none; font: 13px Georgia, serif;
+  color: #8B6914; cursor: pointer; margin-top: 4px;
+}
+.feedback-done-icon { font-size: 36px; display: block; margin: 0 0 8px; }
+.feedback-done-title { font: bold 20px Georgia, serif; color: #2C1810; margin: 0 0 8px; }
+.feedback-done-text { font: 14px Georgia, serif; color: #5C3A1E; margin: 0 0 16px; }
+.feedback-close-btn {
+  padding: 8px 24px; background: #8B6914; color: #FFF8E7;
+  border: none; border-radius: 8px; font: bold 14px Georgia, serif; cursor: pointer;
+}

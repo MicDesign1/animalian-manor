@@ -1,0 +1,207 @@
+/* ═══════════════════════════════════════════════════════
+   ARGON'S LUCKY DICE
+   ═══════════════════════════════════════════════════════ */
+
+.dice-page {
+  background: var(--dark-oak);
+  background-image: radial-gradient(ellipse 70% 50% at 50% 10%, rgba(92,58,30,0.5) 0%, transparent 65%);
+}
+
+.dice-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 20px 32px;
+}
+
+/* ── Rules blurb ── */
+.dice-rules {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--parchment);
+  opacity: 0.6;
+  text-align: center;
+  max-width: 320px;
+}
+
+/* ── Dice tray ── */
+.dice-tray {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Single die ── */
+.die {
+  width: 96px;
+  height: 96px;
+  border-radius: 18px;
+  border: 2px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow:
+    inset 0 2px 8px rgba(255,255,255,0.07),
+    inset 0 -3px 8px rgba(0,0,0,0.4),
+    0 8px 24px rgba(0,0,0,0.6),
+    4px 4px 0 rgba(0,0,0,0.3);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Top-edge highlight */
+.die::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 0 0 2px 2px;
+}
+
+.die--rolling {
+  animation: die-tumble 0.14s ease-in-out infinite alternate;
+}
+
+@keyframes die-tumble {
+  from { transform: rotate(-5deg) scale(1.04); }
+  to   { transform: rotate(5deg)  scale(0.97); }
+}
+
+/* Matched dice glow */
+.die--matched {
+  box-shadow:
+    inset 0 2px 8px rgba(255,255,255,0.1),
+    inset 0 -3px 8px rgba(0,0,0,0.3),
+    0 8px 24px rgba(0,0,0,0.5),
+    0 0 0 3px rgba(196,220,100,0.5),
+    0 0 20px rgba(196,220,100,0.3);
+}
+
+.die-icon  { font-size: 2.8rem; line-height: 1; }
+
+.die-label {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ── Result ── */
+.dice-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  animation: result-fade-in 0.4s ease;
+}
+
+@keyframes result-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dice-result-msg {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--parchment);
+}
+
+.dice-result--3 .dice-result-msg { color: var(--aged-gold); text-shadow: 0 0 16px rgba(196,154,60,0.5); }
+.dice-result--2 .dice-result-msg { color: #a8d8a8; }
+.dice-result--1 .dice-result-msg { opacity: 0.55; }
+
+.dice-result-coins {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  animation: coins-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) 0.1s both;
+}
+
+@keyframes coins-pop {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* ── Roll button ── */
+.dice-roll-btn {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--dark-oak);
+  background: linear-gradient(135deg, var(--aged-gold), var(--brass));
+  border: 2px solid var(--aged-gold);
+  border-radius: 12px;
+  padding: 16px 44px;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 18px rgba(139,105,20,0.45);
+  flex-shrink: 0;
+}
+
+.dice-roll-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(196,154,60,0.55);
+}
+
+.dice-roll-btn:active:not(:disabled) { transform: scale(0.97); }
+
+.dice-roll-btn--rolling {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ── Session total ── */
+.dice-session-total {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  opacity: 0.65;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+/* ── Odds reminder ── */
+.dice-odds {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.dice-odds span {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  color: var(--parchment);
+  opacity: 0.28;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 400px) {
+  .die { width: 80px; height: 80px; border-radius: 14px; }
+  .die-icon { font-size: 2.2rem; }
+  .dice-tray { gap: 12px; }
+}

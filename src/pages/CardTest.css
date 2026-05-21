@@ -1,0 +1,93 @@
+/* ═══════════════════════════════════════════
+   CARD TEST — All-Type Comparison Grid
+   ═══════════════════════════════════════════ */
+
+.card-test {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 32px calc(48px + var(--bottom-bar-height));
+  gap: 8px;
+  background: var(--dark-oak);
+  /* override the global overflow:hidden so this page can scroll */
+  overflow-y: auto;
+}
+
+/* ── Header ── */
+
+.card-test-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 2px;
+}
+
+.card-test-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.card-test-ornament {
+  color: var(--brass);
+  font-size: 1rem;
+  opacity: 0.65;
+}
+
+.card-test-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--parchment);
+  opacity: 0.55;
+  margin-bottom: 24px;
+}
+
+/* ── Card Grid ── */
+
+.card-test-grid {
+  display: grid;
+  /* 3 columns on wide screens, fewer on small screens */
+  grid-template-columns: repeat(3, 250px);
+  gap: 28px;
+  justify-content: center;
+}
+
+@media (max-width: 870px) {
+  .card-test-grid {
+    grid-template-columns: repeat(2, 250px);
+  }
+}
+
+@media (max-width: 560px) {
+  .card-test-grid {
+    grid-template-columns: 250px;
+  }
+}
+
+/* ── Back Button ── */
+
+.card-test-back {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cream);
+  background: rgba(139, 105, 20, 0.3);
+  border: 1px solid var(--brass);
+  border-radius: 8px;
+  padding: 10px 28px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-test-back:hover {
+  background: rgba(139, 105, 20, 0.5);
+  box-shadow: 0 0 14px rgba(196, 154, 60, 0.3);
+}

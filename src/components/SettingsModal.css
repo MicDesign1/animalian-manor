@@ -1,0 +1,221 @@
+/* ══════════════════════════════════════════════
+   SETTINGS MODAL — Audio Settings Panel
+   Victorian naturalist aesthetic matching the
+   rest of Animalian Manor's UI.
+   ══════════════════════════════════════════════ */
+
+/* Dimmed backdrop — click-outside closes the panel */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(20, 10, 5, 0.72);
+  display: flex;
+  align-items: flex-end;       /* anchor to bottom near the bar */
+  justify-content: flex-end;
+  padding: 0 16px calc(var(--bottom-bar-height, 56px) + 8px) 0;
+}
+
+/* Parchment panel */
+.settings-panel {
+  background: var(--parchment, #E8C9A0);
+  border: 2px solid var(--brass, #8B6914);
+  border-radius: 10px;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.2);
+  padding: 18px 20px 16px;
+  min-width: 280px;
+  max-width: 340px;
+  width: 100%;
+}
+
+/* ── Header ── */
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.settings-title {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark-oak, #2C1810);
+  letter-spacing: 0.04em;
+}
+
+.settings-close-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--brass, #8B6914);
+  background: rgba(92, 58, 30, 0.12);
+  color: var(--dark-oak, #2C1810);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.settings-close-btn:hover {
+  background: rgba(139, 105, 20, 0.25);
+  border-color: var(--aged-gold, #C49A3C);
+}
+
+/* ── Decorative rule ── */
+
+.settings-rule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 14px;
+}
+
+.settings-rule--bottom {
+  margin: 14px 0 0;
+}
+
+.settings-rule-gem {
+  font-size: 0.65rem;
+  color: var(--brass, #8B6914);
+  flex-shrink: 0;
+}
+
+.settings-rule-line {
+  flex: 1;
+  height: 1px;
+  background: var(--brass, #8B6914);
+  opacity: 0.35;
+}
+
+/* ── Slider rows ── */
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.settings-row:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Speaker / mute toggle */
+.settings-mute-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  border: 1px solid rgba(139, 105, 20, 0.4);
+  background: rgba(92, 58, 30, 0.1);
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.settings-mute-btn:hover {
+  background: rgba(139, 105, 20, 0.2);
+  border-color: var(--aged-gold, #C49A3C);
+}
+
+.settings-mute-btn--muted {
+  opacity: 0.5;
+}
+
+/* Label + slider container */
+.settings-slider-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-label {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--walnut, #5C3A1E);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.settings-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Range slider — accent-color paints the thumb and track fill in modern browsers */
+.settings-slider {
+  flex: 1;
+  accent-color: var(--brass, #8B6914);
+  cursor: pointer;
+  height: 20px;   /* touch target */
+}
+
+/* Larger thumb on webkit for easier touch use */
+.settings-slider::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+}
+
+.settings-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--aged-gold, #C49A3C);
+  border: 2px solid var(--walnut, #5C3A1E);
+  cursor: pointer;
+}
+
+.settings-vol-pct {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--walnut, #5C3A1E);
+  min-width: 32px;
+  text-align: right;
+}
+
+/* Test SFX button */
+.settings-test-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  background: var(--walnut, #5C3A1E);
+  color: var(--aged-gold, #C49A3C);
+  border: 1px solid var(--brass, #8B6914);
+  border-radius: 6px;
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.settings-test-btn:hover {
+  background: var(--brass, #8B6914);
+  color: var(--cream, #FFF8E7);
+}
+
+/* ── Responsive: on very small screens widen to full width ── */
+
+@media (max-width: 380px) {
+  .settings-overlay {
+    justify-content: center;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .settings-panel {
+    max-width: 100%;
+  }
+}

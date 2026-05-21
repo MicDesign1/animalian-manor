@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(node generate-manifest.js)",
+      "Bash(npx vite *)",
+      "Bash(powershell -Command \"Get-Content 'C:\\\\Users\\\\66081\\\\.claude\\\\projects\\\\d--KID-GAME-project-animalian-manor\\\\f5ebc8e4-6b45-4ee0-991d-bde746f231ec.jsonl' -Tail 30 | Out-String | Select-String 'isJournal'\")",
+      "PowerShell(head -50)",
+      "Bash(mkdir -p \"d:\\\\KID GAME\\\\project\\\\animalian-manor\\\\src\\\\audio\" 2>/dev/null; echo \"done\")",
+      "Bash(ls public/sounds/)",
+      "Bash(ls public/Sounds/)",
+      "Bash(node -e ' *)"
+    ],
+    "additionalDirectories": [
+      "d:\\KID GAME\\project\\animalian-manor\\src"
+    ]
+  }
+}

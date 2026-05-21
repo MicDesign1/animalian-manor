@@ -1,0 +1,278 @@
+/* ══════════════════════════════════════════
+   CREATURE CARD — Victorian Naturalist Style
+   ══════════════════════════════════════════ */
+
+/* --type-color is set inline on each card to the creature's type ink color */
+
+.creature-card {
+  width: 250px;
+  /* Height is automatic — art window is square so the card is naturally taller */
+  background: var(--cream);
+  border: 3px solid var(--type-color, var(--dark-oak));
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.45),
+    0 2px 6px  rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+/* ── Header Bar ── */
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 11px 7px;
+  background: var(--walnut);
+  border-bottom: 2px solid var(--type-color, var(--dark-oak));
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.card-name {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.card-hp {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.card-hp-label {
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: var(--aged-gold);
+  letter-spacing: 0.1em;
+  opacity: 0.75;
+}
+
+
+/* ── Art Window — square ── */
+
+.card-art-window {
+  width: 100%;
+  aspect-ratio: 1 / 1;   /* forces a perfect square */
+  flex-shrink: 0;
+  position: relative;     /* needed for badge + hint overlays */
+  background: var(--cream);
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+}
+
+.card-art-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* object-position and filter are applied via inline style when editing */
+}
+
+.card-art-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+/* Drag-to-reframe mode */
+.card-art-draggable {
+  cursor: grab;
+}
+.card-art-draggable:active {
+  cursor: grabbing;
+}
+
+/* "drag to reframe" hint — bottom-centre overlay */
+.card-art-drag-hint {
+  position: absolute;
+  bottom: 34px;           /* sits above the type badge */
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: rgba(44, 24, 16, 0.55);
+  padding: 2px 8px;
+  border-radius: 999px;
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+
+/* ── Type Badge — overlaid on bottom-left of art window ── */
+
+.card-type-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 3px 7px;
+  border-radius: 999px;
+  color: white;
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  pointer-events: none;   /* doesn't block dragging */
+}
+
+.card-type-icon {
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+
+/* ── Attack Slots ── */
+
+.card-attacks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 9px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--parchment);
+}
+
+.card-attack-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 9px;
+  background: var(--linen);
+  border-left: 4px solid var(--type-color, var(--dark-oak));
+  border-radius: 0 6px 6px 0;
+}
+
+.attack-icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.attack-name {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--dark-oak);
+  flex: 1;
+}
+
+.attack-damage {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--walnut);
+  min-width: 28px;
+  text-align: right;
+}
+
+
+/* ── Stats Bar ── */
+
+.card-stats-bar {
+  display: flex;
+  align-items: center;
+  background: var(--walnut);
+  border-top: 2px solid var(--type-color, var(--dark-oak));
+  flex-shrink: 0;
+}
+
+.card-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 7px 4px;
+  gap: 1px;
+}
+
+.stat-label {
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--parchment);
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+}
+
+.stat-value {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.card-stat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+
+/* ── Level / XP Bar ── */
+
+.card-level-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 6px;
+  background: var(--cream);
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  flex-shrink: 0;
+}
+
+.card-level-label {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--type-color, var(--dark-oak));
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  min-width: 26px;
+}
+
+.card-xp-track {
+  flex: 1;
+  height: 5px;
+  background: var(--parchment);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.card-xp-fill {
+  height: 100%;
+  background: var(--type-color, var(--brass));
+  border-radius: 999px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.card-xp-text {
+  font-family: var(--font-ui);
+  font-size: 0.52rem;
+  color: var(--walnut);
+  opacity: 0.55;
+  white-space: nowrap;
+}

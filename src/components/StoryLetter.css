@@ -1,0 +1,308 @@
+/* ══════════════════════════════════════════════
+   STORY LETTER — Full-screen narrative overlay
+   letter | journal | narrative
+   ══════════════════════════════════════════════ */
+
+
+/* ── Backdrop ── */
+
+@keyframes sl-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sl-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 10, 4, 0.84);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 20px 16px;
+  overflow-y: auto;
+  animation: sl-fade-in 0.3s ease;
+}
+
+/* Narrative backdrop is nearly black — heavier, more dramatic */
+.sl-overlay--narrative {
+  background: rgba(4, 2, 0, 0.94);
+}
+
+
+/* ── Parchment panel ── */
+
+@keyframes sl-rise {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Narrative entry is slower and more deliberate */
+@keyframes sl-rise-dramatic {
+  0%   { opacity: 0; transform: translateY(28px) scale(0.95); }
+  60%  { opacity: 1; }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.sl-panel {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: var(--cream);
+  border-radius: 6px;
+  padding: 32px 28px 28px;
+
+  /* Double border: leather outside, walnut inside */
+  border: 2px solid var(--walnut);
+  outline: 3px solid var(--leather);
+  outline-offset: -1px;
+
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.6),
+    inset 0 0 60px rgba(196, 154, 60, 0.06);
+
+  animation: sl-rise 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Aged paper line texture (matching Intro.css) */
+.sl-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    transparent 0px,
+    transparent 27px,
+    rgba(180, 140, 80, 0.065) 27px,
+    rgba(180, 140, 80, 0.065) 28px
+  );
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Journal — more yellowed, adds a faint ruled notebook effect */
+.sl-panel--journal {
+  background: var(--linen);
+}
+
+.sl-panel--journal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    transparent 0px,
+    transparent 30px,
+    rgba(139, 105, 20, 0.09) 30px,
+    rgba(139, 105, 20, 0.09) 31px
+  );
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Narrative — same parchment but heavier borders and a warmer glow */
+.sl-panel--narrative {
+  border-color: #3D2010;
+  outline-color: #8B5A2B;
+  box-shadow:
+    0 16px 64px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(139, 90, 43, 0.3),
+    inset 0 0 80px rgba(80, 30, 0, 0.07);
+  animation: sl-rise-dramatic 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+
+/* ── Icon ── */
+
+.sl-icon {
+  font-size: 2.8rem;
+  text-align: center;
+  display: block;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.18));
+}
+
+.sl-panel--narrative .sl-icon {
+  filter: drop-shadow(0 0 14px rgba(200, 120, 0, 0.45));
+}
+
+
+/* ── Header ── */
+
+.sl-header {
+  text-align: center;
+  margin-bottom: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.sl-title {
+  font-family: Georgia, var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--dark-oak);
+  letter-spacing: 0.03em;
+  line-height: 1.3;
+  margin: 0 0 5px;
+}
+
+.sl-panel--journal .sl-title {
+  font-style: italic;
+  font-size: 1.05rem;
+}
+
+.sl-panel--narrative .sl-title {
+  font-size: 1.22rem;
+  letter-spacing: 0.05em;
+}
+
+.sl-subtitle {
+  font-family: Georgia, var(--font-body);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--brass);
+  margin: 0;
+  line-height: 1.4;
+}
+
+
+/* ── Decorative rule ── */
+
+.sl-rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.sl-rule-gem {
+  font-size: 0.68rem;
+  color: var(--aged-gold);
+  opacity: 0.65;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.sl-rule-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--aged-gold), transparent);
+  opacity: 0.4;
+}
+
+
+/* ── Body ── */
+
+.sl-body {
+  position: relative;
+  z-index: 1;
+}
+
+.sl-paragraph {
+  font-family: Georgia, var(--font-body);
+  font-size: 0.97rem;
+  line-height: 1.75;
+  color: var(--walnut);
+  margin: 0 0 13px;
+}
+
+.sl-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* Journal — italic throughout to suggest handwritten field notes */
+.sl-panel--journal .sl-paragraph {
+  font-style: italic;
+  color: #4A2C14;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+/* Narrative — slightly heavier, slightly darker for gravitas */
+.sl-panel--narrative .sl-paragraph {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--dark-oak);
+}
+
+
+/* ── Action buttons ── */
+
+.sl-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* When both buttons are present, sit them side by side */
+.sl-actions--two {
+  flex-direction: row;
+}
+
+.sl-actions--two .sl-btn {
+  flex: 1;
+}
+
+.sl-btn {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: 4px;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.sl-btn:active {
+  transform: translateY(1px);
+}
+
+.sl-btn--primary {
+  background: linear-gradient(145deg, var(--brass), var(--aged-gold));
+  color: var(--dark-oak);
+  border: 1px solid var(--aged-gold);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+}
+
+.sl-btn--primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.32);
+}
+
+/* Narrative primary uses a darker ember-gold tone */
+.sl-overlay--narrative .sl-btn--primary {
+  background: linear-gradient(145deg, #7A3010, var(--brass));
+  color: var(--cream);
+  border-color: var(--brass);
+}
+
+.sl-btn--secondary {
+  background: rgba(44, 24, 16, 0.06);
+  color: var(--walnut);
+  border: 1px solid rgba(92, 58, 30, 0.3);
+  font-size: 0.82rem;
+}
+
+.sl-btn--secondary:hover {
+  background: rgba(44, 24, 16, 0.11);
+  border-color: rgba(92, 58, 30, 0.5);
+}
+
+
+/* ── Scrollbar (for long content) ── */
+
+.sl-panel::-webkit-scrollbar { width: 4px; }
+.sl-panel::-webkit-scrollbar-track { background: transparent; }
+.sl-panel::-webkit-scrollbar-thumb {
+  background: rgba(92, 58, 30, 0.22);
+  border-radius: 2px;
+}

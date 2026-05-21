@@ -1,0 +1,232 @@
+/* ══════════════════════════════════════════════
+   BOTTOM BAR — Persistent Game HUD
+   Fixed to the bottom of every screen.
+   Height is controlled by --bottom-bar-height in globals.css.
+   ══════════════════════════════════════════════ */
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-bar-height);
+  /* Pad down into the home-indicator zone on notched phones */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 16px;
+  padding-right: 16px;
+
+  background: var(--walnut);
+  border-top: 2px solid var(--brass);
+  box-shadow: 0 -3px 16px rgba(0, 0, 0, 0.45);
+}
+
+
+/* ── Current room ── */
+
+.bar-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.bar-location-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.bar-location-name {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+
+/* ── Divider rules ── */
+
+.bar-rule {
+  flex: 1;
+  height: 1px;
+  background: rgba(196, 154, 60, 0.18);
+}
+
+
+/* ── Stat chips ── */
+
+.bar-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.bar-stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(196, 154, 60, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.bar-stat-chip:hover {
+  background: rgba(196, 154, 60, 0.15);
+  border-color: var(--aged-gold);
+}
+
+/* Non-interactive version (coins, no destination yet) */
+.bar-stat-chip--static {
+  cursor: default;
+}
+
+.bar-stat-chip--static:hover {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(196, 154, 60, 0.25);
+}
+
+.bar-stat-icon  { font-size: 0.85rem; line-height: 1; }
+
+.bar-stat-value {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.bar-stat-label {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  color: var(--parchment);
+  opacity: 0.6;
+  letter-spacing: 0.04em;
+}
+
+
+/* ── Quick-nav buttons ── */
+
+.bar-quicknav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.bar-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  opacity: 0.6;
+}
+
+.bar-nav-btn:hover {
+  background: rgba(196, 154, 60, 0.12);
+  border-color: rgba(196, 154, 60, 0.3);
+  opacity: 1;
+}
+
+/* Highlight the button for the current page */
+.bar-nav-btn.active {
+  background: rgba(196, 154, 60, 0.18);
+  border-color: var(--aged-gold);
+  opacity: 1;
+}
+
+.bar-nav-icon  { font-size: 1rem; line-height: 1; }
+
+.bar-nav-label {
+  font-family: var(--font-ui);
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--parchment);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+
+/* ── Fullscreen toggle button ── */
+
+.bar-fs-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid rgba(196, 154, 60, 0.3);
+  background: transparent;
+  color: var(--parchment);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.55;
+  transition: opacity 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.bar-fs-btn:hover {
+  opacity: 1;
+  border-color: var(--aged-gold);
+  background: rgba(196, 154, 60, 0.12);
+}
+
+
+/* ── Settings (gear) button ── */
+
+.bar-settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid rgba(196, 154, 60, 0.3);
+  background: transparent;
+  color: var(--brass);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.15s, border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.bar-settings-btn:hover,
+.bar-settings-btn[aria-expanded="true"] {
+  opacity: 1;
+  color: var(--aged-gold);
+  border-color: var(--aged-gold);
+  background: rgba(196, 154, 60, 0.12);
+}
+
+.bar-settings-btn svg {
+  transition: transform 0.4s ease;
+}
+
+.bar-settings-btn:hover svg,
+.bar-settings-btn[aria-expanded="true"] svg {
+  transform: rotate(45deg);
+}
+
+
+/* ── Responsive: hide text labels on very small screens ── */
+
+@media (max-width: 480px) {
+  .bar-location-name { display: none; }
+  .bar-stat-label    { display: none; }
+  .bar-nav-label     { display: none; }
+  .bottom-bar        { gap: 8px; padding-left: 12px; padding-right: 12px; }
+}

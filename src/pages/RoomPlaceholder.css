@@ -1,0 +1,73 @@
+.room-placeholder {
+  width: 100vw;
+  height: calc(100vh - var(--bottom-bar-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark-oak);
+  padding: 20px;
+}
+
+.room-placeholder-card {
+  max-width: 400px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--walnut), #3d2615);
+  border: 2px solid var(--brass);
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.room-placeholder-icon {
+  font-size: 3rem;
+}
+
+.room-placeholder-card h1 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+}
+
+.room-placeholder-desc {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--parchment);
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.room-placeholder-status {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--brass);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 6px 16px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+
+.back-to-manor-btn {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--cream);
+  background: rgba(139, 105, 20, 0.3);
+  border: 1px solid var(--brass);
+  border-radius: 8px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.04em;
+}
+
+.back-to-manor-btn:hover {
+  background: rgba(139, 105, 20, 0.5);
+  box-shadow: 0 0 12px rgba(196, 154, 60, 0.3);
+}

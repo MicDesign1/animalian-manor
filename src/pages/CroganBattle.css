@@ -1,0 +1,693 @@
+/* ═══════════════════════════════════════════
+   CROGAN BATTLE — Village Square story fight
+   ═══════════════════════════════════════════ */
+
+/* ── Page shell ── */
+
+.crogan-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--bottom-bar-height));
+  background: var(--dark-oak);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+
+.crogan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--walnut);
+  border-bottom: 2px solid var(--brass);
+  flex-shrink: 0;
+}
+
+.crogan-back-btn {
+  background: none;
+  border: none;
+  color: var(--leather);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+.crogan-back-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--cream);
+}
+
+.crogan-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crogan-title-icon {
+  font-size: 1.1rem;
+}
+
+.crogan-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 2.2vw, 1.1rem);
+  color: var(--cream);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.crogan-header-filler {
+  width: 80px;
+}
+
+/* ── Selection screen ── */
+
+.crogan-select {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.crogan-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.crogan-empty-icon { font-size: 3rem; }
+
+.crogan-empty-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--aged-gold);
+  margin: 0;
+}
+
+.crogan-empty-body {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--leather);
+  margin: 0;
+}
+
+.crogan-empty-btn {
+  margin-top: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(145deg, var(--brass), var(--aged-gold));
+  color: var(--dark-oak);
+  border: 1px solid var(--aged-gold);
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.crogan-select-prompt {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  color: var(--leather);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+}
+
+.crogan-ornament {
+  color: var(--aged-gold);
+  opacity: 0.6;
+}
+
+.crogan-select-count {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--aged-gold);
+  margin: 0 0 12px;
+}
+
+/* Crogan's team preview */
+.crogan-enemy-preview {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(139, 90, 43, 0.35);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.crogan-enemy-preview-label {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  color: var(--leather);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 8px;
+}
+
+.crogan-enemy-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.crogan-enemy-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 5px 10px;
+}
+
+.crogan-enemy-chip-name {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--cream);
+}
+
+.crogan-enemy-chip-type {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.crogan-chip-type--iron  { background: rgba(26,26,26,0.7);   color: #aaa; }
+.crogan-chip-type--ember { background: rgba(139,37,0,0.35);  color: #e07050; }
+.crogan-chip-type--storm { background: rgba(125,90,0,0.35);  color: #d4a020; }
+.crogan-chip-type--thorn { background: rgba(30,86,49,0.35);  color: #5cb878; }
+.crogan-chip-type--tide  { background: rgba(27,79,114,0.35); color: #5aaad0; }
+.crogan-chip-type--phantom { background: rgba(74,25,66,0.35); color: #c070c0; }
+
+/* Selection grid */
+.crogan-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.crogan-select-slot {
+  position: relative;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.crogan-select-slot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.crogan-select-slot--chosen {
+  outline-color: var(--aged-gold);
+  box-shadow: 0 0 0 3px rgba(196, 154, 60, 0.3);
+}
+
+.crogan-select-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: var(--aged-gold);
+  color: var(--dark-oak);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.crogan-select-hover {
+  position: absolute;
+  inset: 0;
+  background: rgba(196, 154, 60, 0.12);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--cream);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.crogan-select-slot:hover .crogan-select-hover { opacity: 1; }
+.crogan-select-slot--chosen .crogan-select-hover { opacity: 1; }
+
+.crogan-start-btn {
+  margin-top: 20px;
+  padding: 14px 32px;
+  background: linear-gradient(145deg, #7A3010, var(--brass));
+  color: var(--cream);
+  border: 1px solid var(--brass);
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: filter 0.15s, transform 0.15s;
+}
+.crogan-start-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.crogan-start-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Battle screen ── */
+
+.crogan-battle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Team pips row */
+.crogan-teams-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(139, 90, 43, 0.2);
+  flex-shrink: 0;
+}
+
+.crogan-pips {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.crogan-pips--enemy { align-items: flex-end; }
+
+.crogan-pips-label {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  color: var(--leather);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.crogan-pips-row {
+  display: flex;
+  gap: 5px;
+}
+
+.crogan-pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+}
+.crogan-pip--alive   { background: var(--pip-color, #555); }
+.crogan-pip--fainted { background: rgba(255, 255, 255, 0.07); }
+
+/* Battlefield */
+.crogan-battlefield {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 12px;
+  flex-shrink: 0;
+}
+
+.crogan-battle-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 180px;
+}
+
+.crogan-side-label {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0;
+}
+.crogan-side-label--you   { color: #5cb878; }
+.crogan-side-label--enemy { color: #e07050; }
+
+.crogan-battle-vs {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* HP bar */
+.crogan-hp-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.crogan-hp-track {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.crogan-hp-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.crogan-hp-text {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  color: var(--parchment);
+  text-align: right;
+}
+
+/* Battle log */
+.crogan-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 16px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  min-height: 70px;
+  max-height: 130px;
+  border-top: 1px solid rgba(139, 90, 43, 0.18);
+  border-bottom: 1px solid rgba(139, 90, 43, 0.18);
+}
+
+.crogan-log-line {
+  margin: 3px 0;
+  line-height: 1.4;
+}
+.crogan-log-system { color: var(--leather);  }
+.crogan-log-player { color: #5cb878;         }
+.crogan-log-enemy  { color: #e07050;         }
+.crogan-log-info   { color: var(--parchment); opacity: 0.75; }
+
+/* Attack buttons */
+.crogan-actions {
+  flex-shrink: 0;
+  padding: 10px 16px 14px;
+}
+
+.crogan-attack-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.crogan-attack-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: var(--walnut);
+  border: 1.5px solid var(--brass);
+  border-radius: 6px;
+  color: var(--cream);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.crogan-attack-btn:hover:not(:disabled) {
+  background: rgba(92, 58, 30, 0.9);
+  border-color: var(--aged-gold);
+  transform: translateY(-1px);
+}
+.crogan-attack-btn:active:not(:disabled) { transform: translateY(0); }
+
+.crogan-attack-btn--cooldown {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+@keyframes crogan-ready-flash {
+  0%, 100% { border-color: var(--aged-gold); box-shadow: 0 0 0 rgba(196,154,60,0); }
+  50%       { border-color: #FFD700;          box-shadow: 0 0 14px rgba(196,154,60,0.6); }
+}
+.crogan-attack-btn--ready {
+  animation: crogan-ready-flash 0.6s ease 2;
+  border-color: var(--aged-gold);
+}
+
+.crogan-attack-name {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.crogan-attack-dmg {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--leather);
+}
+.crogan-attack-star {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  font-size: 0.65rem;
+  color: var(--aged-gold);
+  opacity: 0.8;
+}
+.crogan-attack-cd {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  color: var(--leather);
+}
+
+.crogan-thinking {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--leather);
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 10px 0 0;
+  opacity: 0.8;
+}
+
+/* Switch panel */
+.crogan-switch-panel {
+  flex-shrink: 0;
+  padding: 12px 16px 16px;
+}
+
+.crogan-switch-prompt {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  color: var(--aged-gold);
+  text-align: center;
+  margin: 0 0 10px;
+  letter-spacing: 0.04em;
+}
+
+.crogan-switch-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Defeat overlay ── */
+
+.crogan-defeat-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(10, 4, 2, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: crogan-fade-in 0.4s ease;
+}
+
+@keyframes crogan-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.crogan-defeat-panel {
+  background: var(--cream);
+  border-radius: 8px;
+  padding: 32px 28px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  border: 2px solid var(--walnut);
+  outline: 2px solid var(--leather);
+  outline-offset: -1px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.65);
+  animation: crogan-panel-rise 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes crogan-panel-rise {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.crogan-defeat-icon  { font-size: 2.8rem; display: block; margin-bottom: 10px; }
+
+.crogan-defeat-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--dark-oak);
+  margin: 0 0 10px;
+  letter-spacing: 0.04em;
+}
+
+.crogan-defeat-body {
+  font-family: Georgia, var(--font-body);
+  font-size: 0.95rem;
+  color: var(--walnut);
+  line-height: 1.65;
+  margin: 0 0 8px;
+}
+
+.crogan-defeat-hint {
+  font-family: Georgia, var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--brass);
+  margin: 0 0 20px;
+}
+
+.crogan-defeat-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  margin-bottom: 8px;
+  background: rgba(44, 24, 16, 0.07);
+  color: var(--walnut);
+  border: 1px solid rgba(92, 58, 30, 0.3);
+}
+.crogan-defeat-btn:last-child { margin-bottom: 0; }
+.crogan-defeat-btn:hover { background: rgba(44, 24, 16, 0.13); }
+.crogan-defeat-btn:active { transform: translateY(1px); }
+
+.crogan-defeat-btn--try-again {
+  background: linear-gradient(145deg, #7A3010, var(--brass));
+  color: var(--cream);
+  border-color: var(--brass);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+}
+.crogan-defeat-btn--try-again:hover { filter: brightness(1.08); }
+
+/* ── Legendary card reveal ── */
+
+.crogan-reveal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(4, 2, 0, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  animation: crogan-fade-in 0.3s ease;
+}
+
+.crogan-reveal-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 340px;
+  width: 100%;
+  animation: crogan-panel-rise 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.crogan-reveal-headline {
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 3vw, 1.35rem);
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+  text-align: center;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(196, 154, 60, 0.5);
+}
+
+.crogan-reveal-sub {
+  font-family: Georgia, var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--leather);
+  margin: 0;
+  text-align: center;
+}
+
+.crogan-reveal-card {
+  width: 100%;
+  max-width: 260px;
+  filter: drop-shadow(0 0 28px rgba(196, 154, 60, 0.5));
+  animation: crogan-card-glow 2s ease-in-out infinite;
+}
+
+@keyframes crogan-card-glow {
+  0%, 100% { filter: drop-shadow(0 0 20px rgba(196, 154, 60, 0.4)); }
+  50%       { filter: drop-shadow(0 0 40px rgba(196, 154, 60, 0.75)); }
+}
+
+.crogan-reveal-btn {
+  padding: 13px 32px;
+  background: linear-gradient(145deg, var(--brass), var(--aged-gold));
+  color: var(--dark-oak);
+  border: 1px solid var(--aged-gold);
+  border-radius: 5px;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: filter 0.15s, transform 0.1s;
+}
+.crogan-reveal-btn:hover  { filter: brightness(1.08); }
+.crogan-reveal-btn:active { transform: translateY(1px); }
+
+/* ── Small screens ── */
+@media (max-width: 480px) {
+  .crogan-title    { font-size: 0.75rem; }
+  .crogan-battlefield { padding: 8px; gap: 8px; }
+  .crogan-battle-side { max-width: 145px; }
+  .crogan-attack-row  { gap: 7px; }
+  .crogan-attack-btn  { padding: 10px 6px; }
+}

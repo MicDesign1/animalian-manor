@@ -1,0 +1,439 @@
+/* ═══════════════════════════════════════════════════
+   THE MENAGERIE GARDEN — Creature Collection Browser
+   ═══════════════════════════════════════════════════ */
+
+
+/* ── Page shell ── */
+
+.menagerie-page {
+  width: 100%;
+  min-height: 100vh;
+  padding-bottom: var(--bottom-bar-height);
+  display: flex;
+  flex-direction: column;
+  background: var(--dark-oak);
+
+  /* Subtle radial glow, like light coming through a greenhouse roof */
+  background-image: radial-gradient(
+    ellipse 80% 40% at 50% 0%,
+    rgba(92, 58, 30, 0.55) 0%,
+    transparent 70%
+  );
+}
+
+
+/* ════════════════════════════════════════
+   HEADER
+   ════════════════════════════════════════ */
+
+.menagerie-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 60px;
+  flex-shrink: 0;
+  background: var(--walnut);
+  border-bottom: 2px solid var(--brass);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  gap: 12px;
+}
+
+.menagerie-back-btn,
+.menagerie-lab-btn {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.menagerie-back-btn {
+  color: var(--parchment);
+  background: transparent;
+  border: 1px solid rgba(196, 154, 60, 0.3);
+}
+
+.menagerie-back-btn:hover {
+  color: var(--aged-gold);
+  border-color: var(--aged-gold);
+  background: rgba(196, 154, 60, 0.12);
+}
+
+/* "New Creature" button uses the brass/gold style */
+.menagerie-lab-btn {
+  color: var(--dark-oak);
+  background: linear-gradient(135deg, var(--aged-gold) 0%, var(--brass) 100%);
+  border: 2px solid var(--aged-gold);
+  box-shadow: 0 2px 8px rgba(139, 105, 20, 0.35);
+}
+
+.menagerie-lab-btn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 3px 14px rgba(196, 154, 60, 0.5);
+}
+
+.menagerie-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+}
+
+.menagerie-title-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.menagerie-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 2.5vw, 1.25rem);
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.07em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  line-height: 1.1;
+}
+
+.menagerie-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--parchment);
+  opacity: 0.55;
+  margin-top: 1px;
+}
+
+
+/* ════════════════════════════════════════
+   MAIN CONTENT AREA
+   ════════════════════════════════════════ */
+
+.menagerie-main {
+  flex: 1;
+  padding: 36px 32px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+/* ════════════════════════════════════════
+   EMPTY STATE
+   ════════════════════════════════════════ */
+
+.menagerie-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 80px;
+  max-width: 360px;
+  text-align: center;
+}
+
+.empty-illustration {
+  font-size: 4rem;
+  opacity: 0.5;
+  animation: gentle-sway 4s ease-in-out infinite;
+}
+
+@keyframes gentle-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50%       { transform: rotate(4deg); }
+}
+
+.empty-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+
+.empty-body {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--parchment);
+  line-height: 1.6;
+  opacity: 0.65;
+}
+
+.empty-lab-btn {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--dark-oak);
+  background: linear-gradient(135deg, var(--aged-gold) 0%, var(--brass) 100%);
+  border: 2px solid var(--aged-gold);
+  border-radius: 8px;
+  padding: 11px 28px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  box-shadow: 0 3px 14px rgba(139, 105, 20, 0.4);
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.empty-lab-btn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 20px rgba(196, 154, 60, 0.55);
+}
+
+
+/* ════════════════════════════════════════
+   TOOLBAR (sort + drag hint)
+   ════════════════════════════════════════ */
+
+.menagerie-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+
+.menagerie-drag-hint {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--parchment);
+  opacity: 0.38;
+}
+
+.sort-type-btn {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--aged-gold);
+  background: transparent;
+  border: 1px solid rgba(196, 154, 60, 0.35);
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.sort-type-btn:hover {
+  background: rgba(196, 154, 60, 0.12);
+  border-color: var(--aged-gold);
+}
+
+
+/* ════════════════════════════════════════
+   CARD GRID
+   ════════════════════════════════════════ */
+
+.creature-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Each slot holds the card + the release button */
+.creature-slot {
+  position: relative;
+  /* Entrance animation when the page loads */
+  animation: card-appear 0.35s ease both;
+}
+
+/* Stagger each card's entrance by its position */
+.creature-slot:nth-child(1)  { animation-delay: 0.04s; }
+.creature-slot:nth-child(2)  { animation-delay: 0.08s; }
+.creature-slot:nth-child(3)  { animation-delay: 0.12s; }
+.creature-slot:nth-child(4)  { animation-delay: 0.16s; }
+.creature-slot:nth-child(5)  { animation-delay: 0.20s; }
+.creature-slot:nth-child(6)  { animation-delay: 0.24s; }
+.creature-slot:nth-child(7)  { animation-delay: 0.28s; }
+.creature-slot:nth-child(8)  { animation-delay: 0.32s; }
+
+@keyframes card-appear {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Grab cursor when draggable */
+.creature-slot[draggable="true"] {
+  cursor: grab;
+}
+
+/* Source card while dragging — ghost it out */
+.creature-slot--dragging {
+  opacity: 0.35;
+  cursor: grabbing;
+}
+
+/* Drop target highlight */
+.creature-slot--drag-over {
+  outline: 2px dashed var(--aged-gold);
+  outline-offset: 5px;
+  border-radius: 12px;
+}
+
+/* Subtle lift on hover */
+.creature-slot:hover {
+  z-index: 1;
+}
+
+.creature-slot:hover > .creature-card {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.55),
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Release (delete) button — hidden until the slot is hovered */
+.release-btn {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--walnut);
+  border: 2px solid var(--brass);
+  color: var(--parchment);
+  font-size: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.15s ease;
+  z-index: 10;
+}
+
+.creature-slot:hover .release-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.release-btn:hover {
+  background: #8B2500;
+  border-color: #8B2500;
+  color: #fff;
+}
+
+
+/* ── Melt confirmation overlay ── */
+
+.melt-confirm-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;   /* match the card's border-radius */
+  background: rgba(44, 24, 16, 0.93);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 18px;
+  text-align: center;
+  z-index: 20;
+  animation: overlay-appear 0.18s ease;
+}
+
+@keyframes overlay-appear {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+.melt-warning-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+}
+
+.melt-warning-body {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--parchment);
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.melt-warning-body strong {
+  color: var(--cream);
+  font-style: normal;
+}
+
+.melt-confirm-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.melt-yes-btn,
+.melt-no-btn {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border-radius: 6px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+/* "Yes, melt it" — ember red, dangerous action */
+.melt-yes-btn {
+  background: #8B2500;
+  color: #fff;
+  border: 2px solid #8B2500;
+}
+
+.melt-yes-btn:hover { filter: brightness(1.2); }
+
+/* "Keep it" — neutral/safe */
+.melt-no-btn {
+  background: transparent;
+  color: var(--parchment);
+  border: 2px solid rgba(196, 154, 60, 0.4);
+}
+
+.melt-no-btn:hover {
+  border-color: var(--aged-gold);
+  color: var(--aged-gold);
+}
+
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  .menagerie-main {
+    padding: 24px 16px 48px;
+  }
+
+  .menagerie-header {
+    padding: 0 12px;
+    height: 56px;
+  }
+
+  /* Hide the subtitle text on tiny screens */
+  .menagerie-subtitle { display: none; }
+
+  .menagerie-drag-hint { display: none; }
+  .menagerie-toolbar { justify-content: flex-end; margin-bottom: 12px; }
+}

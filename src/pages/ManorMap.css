@@ -1,0 +1,668 @@
+/* ═══════════════════════════════════════════
+   MANOR MAP — Home Screen
+   ═══════════════════════════════════════════ */
+
+.manor-map {
+  width: 100vw;
+  height: calc(100vh - var(--bottom-bar-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--dark-oak);
+  overflow: hidden;
+}
+
+/* ── Title Banner ── */
+
+.manor-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  padding: 10px 24px;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.manor-title-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.manor-title h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.manor-title-ornament {
+  color: var(--brass);
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  opacity: 0.7;
+}
+
+/* ── Profile badge (top-right corner of the title bar) ── */
+
+.manor-profile-badge {
+  position: absolute;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manor-profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 2px solid rgba(196,154,60,0.4);
+  flex-shrink: 0;
+}
+
+.manor-profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.manor-profile-name {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--aged-gold);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.manor-switch-btn {
+  background: none;
+  border: none;
+  color: var(--leather);
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.manor-switch-btn:hover {
+  opacity: 1;
+  color: var(--parchment);
+}
+
+/* ── Map Container ── */
+
+.manor-map-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.manor-map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  filter: brightness(1.05) saturate(1.1);
+}
+
+/* ── Room Hotspots ── */
+
+.room-hotspot {
+  position: absolute;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.room-hotspot-label {
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.room-icon {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.room-name {
+  font-family: var(--font-display);
+  font-size: clamp(0.55rem, 1.5vw, 0.85rem);
+  font-weight: 600;
+  color: var(--cream);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Hover state */
+.room-hotspot.hovered {
+  border-color: var(--aged-gold);
+  background: rgba(196, 154, 60, 0.12);
+  box-shadow:
+    inset 0 0 30px rgba(196, 154, 60, 0.08),
+    0 0 15px rgba(196, 154, 60, 0.2);
+}
+
+.room-hotspot.hovered .room-hotspot-label {
+  opacity: 1;
+}
+
+/* Click/tap state */
+.room-hotspot.clicked {
+  border-color: var(--aged-gold);
+  background: rgba(196, 154, 60, 0.3);
+  box-shadow:
+    inset 0 0 40px rgba(196, 154, 60, 0.15),
+    0 0 30px rgba(196, 154, 60, 0.4);
+  animation: room-pulse 0.4s ease-out;
+}
+
+@keyframes room-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* ── Room Info Bar (bottom tooltip) ── */
+
+.room-info-bar {
+  position: fixed;
+  bottom: var(--bottom-bar-height);
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: linear-gradient(
+    to top,
+    rgba(44, 24, 16, 0.97),
+    rgba(44, 24, 16, 0.85)
+  );
+  border-top: 1px solid var(--brass);
+  backdrop-filter: blur(8px);
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  z-index: 20;
+}
+
+.room-info-bar.visible {
+  transform: translateY(0);
+}
+
+.room-info-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.room-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.room-info-text strong {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--aged-gold);
+  letter-spacing: 0.04em;
+}
+
+.room-info-text span {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--parchment);
+  opacity: 0.85;
+}
+
+.room-info-tap {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--aged-gold);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+/* ── Touch devices: show labels on tap ── */
+@media (hover: none) {
+  .room-hotspot-label {
+    opacity: 1;
+  }
+  .room-name {
+    background: rgba(44, 24, 16, 0.7);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+}
+
+/* ── Tutorial Overlay ── */
+
+/*
+ * Transparent click-catcher sitting above everything.
+ * No background normally — the spotlight's box-shadow provides the dimming.
+ * On the final step (no spotlight), --dim adds the background directly.
+ */
+.tut-tap-catcher {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tut-tap-catcher--dim {
+  background: rgba(0, 0, 0, 0.78);
+}
+
+/*
+ * Spotlight: transparent box whose outward box-shadow dims the rest of the screen.
+ * The element itself is invisible — the room hotspot beneath it shows through.
+ */
+.tut-spotlight {
+  position: fixed;
+  z-index: 201;
+  border-radius: 8px;
+  pointer-events: none;
+  animation: tut-spot-in 0.3s ease both, tut-spot-pulse 2.4s 0.3s ease-in-out infinite;
+}
+
+@keyframes tut-spot-in {
+  from { box-shadow: 0 0 0 9999px rgba(0,0,0,0), 0 0 0 0 transparent; opacity: 0.4; }
+  to   {
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.78),
+      0 0 0 2px var(--aged-gold),
+      0 0 20px rgba(196, 154, 60, 0.55);
+    opacity: 1;
+  }
+}
+
+@keyframes tut-spot-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.78),
+      0 0 0 2px var(--aged-gold),
+      0 0 18px rgba(196, 154, 60, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.78),
+      0 0 0 3px var(--aged-gold),
+      0 0 36px rgba(196, 154, 60, 0.8);
+  }
+}
+
+/* Tooltip bubble */
+.tut-tooltip {
+  z-index: 202;
+  width: 300px;
+  background: #FFF8E7;
+  border: 1.5px solid #8B6914;
+  border-radius: 8px;
+  padding: 16px 18px 12px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+  animation: tut-tip-in 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes tut-tip-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tut-text {
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #2C1810;
+  margin: 0 0 12px;
+}
+
+.tut-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tut-counter {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  color: #8B6914;
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+
+.tut-tap {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-style: italic;
+  color: #8B6914;
+  text-align: right;
+}
+
+/* Skip link in top-right corner */
+.tut-skip {
+  position: fixed;
+  top: 58px;
+  right: 14px;
+  z-index: 202;
+  background: transparent;
+  border: 1px solid rgba(196, 154, 60, 0.35);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.tut-skip:hover {
+  color: var(--aged-gold);
+  border-color: var(--aged-gold);
+  background: rgba(196, 154, 60, 0.08);
+}
+
+/* ── Trapdoor hotspot (appears after ransack event) ── */
+
+@keyframes trapdoor-pulse {
+  0%, 100% {
+    border-color: rgba(139, 90, 43, 0.75);
+    box-shadow: 0 0 14px rgba(139, 90, 43, 0.45), inset 0 0 20px rgba(139, 90, 43, 0.1);
+  }
+  50% {
+    border-color: var(--aged-gold);
+    box-shadow: 0 0 28px rgba(196, 154, 60, 0.65), inset 0 0 28px rgba(196, 154, 60, 0.15);
+  }
+}
+
+.room-hotspot--trapdoor {
+  border: 2px solid rgba(139, 90, 43, 0.75);
+  animation: trapdoor-pulse 2.2s ease-in-out infinite;
+}
+
+/* "NEW" badge in the corner of the trapdoor hotspot */
+.room-hotspot-new {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--dark-oak);
+  background: var(--aged-gold);
+  border-radius: 3px;
+  padding: 1px 5px;
+  pointer-events: none;
+  animation: trapdoor-pulse 2.2s ease-in-out infinite;
+}
+
+/* ── Hotspot editor mode ── */
+
+.room-hotspot--edit {
+  border: 2px dashed rgba(196, 154, 60, 0.8) !important;
+  background: rgba(196, 154, 60, 0.08) !important;
+  cursor: grab !important;
+  pointer-events: all !important;
+  animation: none !important;
+  box-shadow: none !important;
+}
+
+.room-hotspot--edit:active {
+  cursor: grabbing !important;
+}
+
+.room-hotspot--edit .room-hotspot-label {
+  opacity: 1;
+}
+
+/* W/H size buttons inside edit-mode hotspot labels */
+.edit-size-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.edit-size-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.edit-size-label {
+  font-family: monospace;
+  font-size: 0.6rem;
+  color: var(--aged-gold);
+  width: 10px;
+}
+
+.edit-size-controls button {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: rgba(44, 24, 16, 0.85);
+  border: 1px solid var(--aged-gold);
+  border-radius: 3px;
+  color: var(--aged-gold);
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-size-controls button:hover {
+  background: rgba(196, 154, 60, 0.25);
+}
+
+/* Collapsed FAB button */
+.manor-edit-fab {
+  position: fixed;
+  bottom: calc(var(--bottom-bar-height) + 12px);
+  right: 12px;
+  z-index: 300;
+  background: rgba(20, 10, 5, 0.88);
+  border: 1.5px solid #8B6914;
+  border-radius: 8px;
+  color: #C49A3C;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s, border-color 0.15s;
+}
+.manor-edit-fab:hover {
+  background: rgba(44, 20, 8, 0.95);
+  border-color: #C49A3C;
+}
+
+/* Open panel */
+.manor-edit-panel {
+  position: fixed;
+  bottom: calc(var(--bottom-bar-height) + 12px);
+  right: 12px;
+  z-index: 300;
+  background: rgba(20, 10, 5, 0.93);
+  border: 1.5px solid #8B6914;
+  border-radius: 10px;
+  padding: 10px 14px 12px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  backdrop-filter: blur(6px);
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #C49A3C;
+}
+
+.manor-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.manor-edit-title {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #C49A3C;
+  letter-spacing: 0.06em;
+}
+
+.manor-edit-toggle {
+  background: none;
+  border: none;
+  color: #8B6914;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.manor-edit-toggle:hover { color: #C49A3C; }
+
+/* Scrollable rooms list — max ~25% screen height */
+.manor-edit-rooms {
+  overflow-y: auto;
+  max-height: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.manor-edit-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-bottom: 1px solid rgba(139, 105, 20, 0.2);
+  padding-bottom: 5px;
+}
+
+.manor-edit-room-name {
+  color: #E8C9A0;
+  font-weight: bold;
+}
+
+.manor-edit-vals {
+  color: #8B6914;
+  word-break: break-all;
+}
+
+/* Copy All — always visible below the scroll area */
+.manor-edit-copy {
+  background: #3D2010;
+  border: 1px solid #8B6914;
+  border-radius: 5px;
+  color: #C49A3C;
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+.manor-edit-copy:hover { background: #5C3A1E; }
+
+/* ── Responsive hotspot positions ── */
+
+/* Basement/trapdoor is always rotated 90° regardless of breakpoint */
+.room-hotspot--basement {
+  transform: rotate(90deg);
+  transform-origin: center;
+}
+
+@media (max-width: 429px) {
+  .room-hotspot--menagerie { top: 19.8%; left: 2.6%;  width: 94%;  height: 18.5%; }
+  .room-hotspot--lab       { top: 38.6%; left: 2.7%;  width: 35%;  height: 12%;   }
+  .room-hotspot--study     { top: 38.7%; left: 62.0%; width: 35%;  height: 12%;   }
+  .room-hotspot--parlor    { top: 51.1%; left: 2.2%;  width: 35%;  height: 13.5%; }
+  .room-hotspot--arena     { top: 50.5%; left: 62.8%; width: 35%;  height: 13.5%; }
+  .room-hotspot--basement  { top: 44%;   left: 37%;   width: 13%;  height: 16%;   }
+}
+
+@media (min-width: 430px) and (max-width: 623px) {
+  .room-hotspot--menagerie { top: 20.4%; left: 2.6%;  width: 94%;  height: 18.5%; }
+  .room-hotspot--lab       { top: 38.9%; left: 1.9%;  width: 35%;  height: 12%;   }
+  .room-hotspot--study     { top: 38.8%; left: 61.8%; width: 35%;  height: 12%;   }
+  .room-hotspot--parlor    { top: 50.7%; left: 2.4%;  width: 35%;  height: 13.5%; }
+  .room-hotspot--arena     { top: 50.6%; left: 62.2%; width: 35%;  height: 13.5%; }
+  .room-hotspot--basement  { top: 44%;   left: 37%;   width: 13%;  height: 16%;   }
+}
+
+@media (min-width: 624px) and (max-width: 895px) {
+  .room-hotspot--menagerie { top: 19.6%; left: 2.7%;  width: 94%;  height: 18.5%; }
+  .room-hotspot--lab       { top: 38.3%; left: 2.2%;  width: 35%;  height: 12%;   }
+  .room-hotspot--study     { top: 38.8%; left: 61.8%; width: 35%;  height: 12%;   }
+  .room-hotspot--parlor    { top: 50.4%; left: 2.4%;  width: 35%;  height: 13.5%; }
+  .room-hotspot--arena     { top: 50.6%; left: 62.2%; width: 35%;  height: 13.5%; }
+  .room-hotspot--basement  { top: 44%;   left: 37%;   width: 13%;  height: 16%;   }
+}
+
+@media (min-width: 896px) and (max-width: 1152px) {
+  .room-hotspot--menagerie { top: 19.6%; left: 2.7%;  width: 94%;  height: 18.5%; }
+  .room-hotspot--lab       { top: 38.3%; left: 2.2%;  width: 35%;  height: 12%;   }
+  .room-hotspot--study     { top: 38.2%; left: 61.9%; width: 35%;  height: 12%;   }
+  .room-hotspot--parlor    { top: 50.4%; left: 2.4%;  width: 35%;  height: 13.5%; }
+  .room-hotspot--arena     { top: 50.3%; left: 61.5%; width: 35%;  height: 13.5%; }
+  .room-hotspot--basement  { top: 44%;   left: 37%;   width: 13%;  height: 16%;   }
+}
+
+@media (min-width: 1153px) {
+  .room-hotspot--menagerie { top: 8.7%;  left: 2.8%;  width: 94%;  height: 18.5%; }
+  .room-hotspot--lab       { top: 35.1%; left: 2.8%;  width: 35%;  height: 12%;   }
+  .room-hotspot--study     { top: 35.1%; left: 62.1%; width: 35%;  height: 12%;   }
+  .room-hotspot--parlor    { top: 54.9%; left: 1.8%;  width: 35%;  height: 13.5%; }
+  .room-hotspot--arena     { top: 54.5%; left: 62.2%; width: 35%;  height: 13.5%; }
+  .room-hotspot--basement  { top: 43.7%; left: 36.8%; width: 13%;  height: 16%;   }
+}
+
+/* ── Small screens ── */
+@media (max-width: 480px) {
+  .manor-title {
+    padding: 8px 16px;
+  }
+  .room-info-tap {
+    display: none;
+  }
+}

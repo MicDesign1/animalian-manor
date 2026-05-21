@@ -1,0 +1,590 @@
+/* ═══════════════════════════════════════════════════════
+   THE STUDY — Bookshelf & Library Screen
+   ═══════════════════════════════════════════════════════ */
+
+.study-page {
+  height: calc(100vh - var(--bottom-bar-height));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--dark-oak);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(92, 58, 30, 0.5) 0%, transparent 65%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 48px,
+      rgba(0, 0, 0, 0.04) 48px,
+      rgba(0, 0, 0, 0.04) 50px
+    );
+}
+
+
+/* ════════════════════════════════════════
+   HEADER
+   ════════════════════════════════════════ */
+
+.study-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 52px;
+  flex-shrink: 0;
+  background: var(--walnut);
+  border-bottom: 2px solid var(--brass);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.study-back-btn {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--parchment);
+  background: transparent;
+  border: 1px solid rgba(196, 154, 60, 0.3);
+  border-radius: 6px;
+  padding: 5px 14px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.study-back-btn:hover {
+  color: var(--aged-gold);
+  border-color: var(--aged-gold);
+  background: rgba(196, 154, 60, 0.1);
+}
+
+.study-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+}
+
+.study-title-icon { font-size: 1.2rem; }
+
+.study-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.study-header-filler { min-width: 80px; flex-shrink: 0; }
+
+
+/* ════════════════════════════════════════
+   MAIN CONTENT
+   ════════════════════════════════════════ */
+
+.study-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 20px 28px;
+}
+
+.study-hint {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--parchment);
+  opacity: 0.45;
+  letter-spacing: 0.04em;
+}
+
+.study-footer-note {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--aged-gold);
+  opacity: 0.35;
+  letter-spacing: 0.06em;
+}
+
+
+/* ════════════════════════════════════════
+   BOOKCASE
+   ════════════════════════════════════════ */
+
+.bookcase {
+  width: 100%;
+  max-width: 680px;
+  background: #1C0D07;
+  border: 8px solid #1A0A04;
+  border-radius: 6px 6px 4px 4px;
+  box-shadow:
+    inset 0 0 40px rgba(0, 0, 0, 0.6),
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    0 2px 0 rgba(196, 154, 60, 0.15);
+  display: flex;
+  flex-direction: column;
+  padding: 6px 6px 0;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+/* Bookcase crown rail at top */
+.bookcase::before {
+  content: '';
+  display: block;
+  height: 10px;
+  background: linear-gradient(180deg, #3A1E0C, #2A1208);
+  border-radius: 2px;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes rumble {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  10%       { transform: translateX(-4px) rotate(-0.4deg); }
+  20%       { transform: translateX(4px)  rotate(0.4deg); }
+  30%       { transform: translateX(-4px); }
+  40%       { transform: translateX(4px); }
+  50%       { transform: translateX(-3px) rotate(-0.2deg); }
+  60%       { transform: translateX(3px)  rotate(0.2deg); }
+  70%       { transform: translateX(-2px); }
+  80%       { transform: translateX(2px); }
+  90%       { transform: translateX(-1px); }
+}
+
+.bookcase--rumbling {
+  animation: rumble 0.75s ease;
+}
+
+
+/* ════════════════════════════════════════
+   SHELVES
+   ════════════════════════════════════════ */
+
+.shelf {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  padding: 6px 10px 0;
+  /* The shelf plank itself */
+  border-bottom: 11px solid #2A1208;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+/* Plank highlight edge */
+.shelf::after {
+  content: '';
+  position: absolute;
+  bottom: -11px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(139, 105, 20, 0.25);
+}
+
+/* The dark bottom shelf where the vault book lives */
+.shelf--dark {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+
+/* ════════════════════════════════════════
+   BOOKS
+   ════════════════════════════════════════ */
+
+.book {
+  flex-shrink: 0;
+  border-radius: 2px 4px 4px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  /* Inner lighting: bright left face, shadow on right */
+  box-shadow:
+    inset 3px 0 5px rgba(255, 255, 255, 0.12),
+    inset -3px 0 6px rgba(0, 0, 0, 0.35),
+    2px 0 6px rgba(0, 0, 0, 0.4);
+  user-select: none;
+  position: relative;
+}
+
+.book:hover {
+  transform: translateY(-10px);
+  filter: brightness(1.18);
+  z-index: 2;
+}
+
+.book:active { transform: translateY(-8px) scale(0.98); }
+
+/* Height variants */
+.book--tall   { height: 162px; }
+.book--medium { height: 130px; }
+.book--short  { height: 98px;  }
+
+/* Width variants */
+.book--wide   { width: 58px; }
+.book--normal { width: 40px; }
+.book--thin   { width: 27px; }
+
+/* Spine text — reads bottom-to-top (standard book orientation) */
+.book-spine {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.68rem;
+  line-height: 1;
+  padding: 10px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  max-height: 92%;
+  letter-spacing: 0.03em;
+  user-select: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Dusty vault book */
+.book--dusty {
+  filter: grayscale(0.7) brightness(0.55) saturate(0.4);
+  cursor: pointer;
+}
+
+.book--dusty:hover {
+  filter: grayscale(0.4) brightness(0.75) saturate(0.7);
+  transform: translateY(-8px);
+}
+
+/* Cobweb overlay via pseudo-element */
+.book--dusty::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(200,200,180,0.07) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(200,200,180,0.05) 0%, transparent 40%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Book with a hidden journal page — subtle golden shimmer + paper corner */
+.book--has-secret {
+  animation: secret-shimmer 3s ease-in-out infinite;
+  overflow: visible;
+}
+
+.book--has-secret::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%) rotate(4deg);
+  width: 13px;
+  height: 11px;
+  background: linear-gradient(160deg, #FAF0D8, #EDE0BC);
+  border: 1px solid rgba(139, 105, 20, 0.35);
+  border-radius: 1px 2px 0 0;
+  box-shadow:
+    0 -2px 5px rgba(0, 0, 0, 0.22),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  z-index: 3;
+}
+
+@keyframes secret-shimmer {
+  0%, 100% { filter: brightness(1); }
+  50%       { filter: brightness(1.22) drop-shadow(0 0 7px rgba(196, 154, 60, 0.55)); }
+}
+
+/* Empty shelf slot */
+.book-slot {
+  flex: 1;
+  min-width: 22px;
+  max-width: 80px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 1px;
+  border: 1px dashed rgba(255, 255, 255, 0.04);
+}
+
+
+/* ════════════════════════════════════════
+   BOOK READING MODAL
+   ════════════════════════════════════════ */
+
+.book-modal-overlay {
+  position: fixed;
+  inset: 0;
+  bottom: var(--bottom-bar-height);
+  background: rgba(18, 8, 4, 0.88);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: 20px;
+  animation: fade-in 0.2s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.open-book {
+  display: flex;
+  position: relative;
+  max-width: 740px;
+  width: 100%;
+  max-height: calc(100vh - var(--bottom-bar-height) - 60px);
+  background: var(--cream);
+  border-radius: 3px 5px 5px 3px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0,0,0,0.1);
+  overflow: hidden;
+  animation: book-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+@keyframes book-open {
+  from { transform: scale(0.9) rotateY(-6deg); opacity: 0; }
+  to   { transform: scale(1)   rotateY(0deg);  opacity: 1; }
+}
+
+/* Left page — title / author */
+.book-page--left {
+  width: 220px;
+  flex-shrink: 0;
+  background: #F0E6CC;
+  padding: 40px 28px;
+  border-right: 3px solid #C8A878;
+  box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.book-ornament {
+  font-size: 1.5rem;
+  color: var(--brass);
+  opacity: 0.55;
+}
+
+.book-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.78rem, 1.5vw, 0.95rem);
+  font-weight: 700;
+  color: var(--dark-oak);
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+}
+
+.book-rule {
+  width: 60px;
+  height: 1px;
+  background: var(--brass);
+  opacity: 0.5;
+}
+
+.book-author {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--walnut);
+  line-height: 1.5;
+  opacity: 0.75;
+}
+
+.book-library {
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  color: var(--brass);
+  opacity: 0.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+/* Right page — body text */
+.book-page--right {
+  flex: 1;
+  background: var(--cream);
+  padding: 36px 36px 56px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.book-para {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--dark-oak);
+  line-height: 1.7;
+  white-space: pre-line; /* preserves \n in content strings */
+}
+
+/* Close button — overlaps bottom of book */
+.book-close-btn {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--walnut);
+  background: rgba(196, 154, 60, 0.12);
+  border: 1px solid rgba(139, 105, 20, 0.35);
+  border-radius: 20px;
+  padding: 6px 20px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.book-close-btn:hover {
+  background: rgba(196, 154, 60, 0.22);
+  border-color: var(--brass);
+}
+
+
+/* ════════════════════════════════════════
+   VAULT DISCOVERY OVERLAY
+   ════════════════════════════════════════ */
+
+.vault-discover-overlay {
+  position: fixed;
+  inset: 0;
+  bottom: var(--bottom-bar-height);
+  background: rgba(0, 0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 70;
+  pointer-events: none;
+  transition: background 0.4s ease;
+}
+
+.vault-discover-overlay--visible {
+  background: rgba(0, 0, 0, 0.92);
+  pointer-events: all;
+}
+
+.vault-discover-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 380px;
+  text-align: center;
+  padding: 48px 40px;
+  background: linear-gradient(160deg, #1A0C06, #0E0806);
+  border: 1px solid rgba(196, 154, 60, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 0 80px rgba(196, 154, 60, 0.15), 0 20px 60px rgba(0, 0, 0, 0.8);
+  animation: vault-panel-appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+@keyframes vault-panel-appear {
+  from { transform: scale(0.8) translateY(20px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+.vault-discover-icon {
+  font-size: 3.5rem;
+  animation: vault-icon-spin 0.6s ease;
+}
+
+@keyframes vault-icon-spin {
+  from { transform: scale(0) rotate(-30deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+.vault-discover-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 20px rgba(196, 154, 60, 0.5);
+}
+
+.vault-discover-body {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--parchment);
+  line-height: 1.65;
+  opacity: 0.85;
+}
+
+.vault-discover-btn {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--dark-oak);
+  background: linear-gradient(135deg, var(--aged-gold), var(--brass));
+  border: 2px solid var(--aged-gold);
+  border-radius: 8px;
+  padding: 12px 32px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(196, 154, 60, 0.35);
+  transition: filter 0.2s, box-shadow 0.2s;
+}
+
+.vault-discover-btn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 28px rgba(196, 154, 60, 0.55);
+}
+
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  .study-page { height: auto; overflow: visible; }
+  .study-main { overflow-y: visible; }
+
+  /* On mobile, collapse left page into a compact title strip */
+  .open-book { flex-direction: column; max-height: 90vh; }
+
+  .book-page--left {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 16px 20px;
+    gap: 6px;
+    border-right: none;
+    border-bottom: 2px solid #C8A878;
+    box-shadow: none;
+  }
+
+  .book-ornament { display: none; }
+  .book-title    { font-size: 0.88rem; }
+  .book-rule     { display: none; }
+  .book-library  { display: none; }
+
+  .book-page--right { padding: 20px 20px 52px; }
+
+  .shelf { gap: 4px; padding: 4px 6px 0; }
+
+  .book--wide   { width: 48px; }
+  .book--normal { width: 34px; }
+  .book--thin   { width: 22px; }
+}

@@ -1,0 +1,199 @@
+/* ═══════════════════════════════════════════
+   INTRO — First-launch letter from the solicitor
+   ═══════════════════════════════════════════ */
+
+.intro-page {
+  width: 100vw;
+  height: 100vh;
+  background:
+    radial-gradient(ellipse at center, #3a1f0e 0%, #1a0d06 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: 24px 16px;
+}
+
+/* ── The outer "envelope" wrapper that animates open ── */
+
+.intro-envelope {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  opacity: 0;
+  transform: translateY(-24px) scaleY(0.88);
+  transform-origin: top center;
+  transition: opacity 0.75s ease-out, transform 0.75s ease-out;
+}
+
+.intro-envelope--open {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+}
+
+/* ── Wax seal at the top ── */
+
+.intro-wax-seal {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #c0392b, #7b241c);
+  border: 3px solid #e8703a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6), inset 0 -2px 4px rgba(0,0,0,0.3);
+  margin-bottom: -28px;
+  z-index: 2;
+  position: relative;
+}
+
+/* ── The letter itself ── */
+
+.intro-letter {
+  background: var(--cream);
+  border: 2px solid var(--parchment);
+  border-radius: 4px;
+  padding: 52px 36px 28px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.5),
+    inset 0 0 40px rgba(196,154,60,0.08);
+  width: 100%;
+  position: relative;
+}
+
+/* Aged paper texture line */
+.intro-letter::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    transparent 0px,
+    transparent 27px,
+    rgba(180,140,80,0.07) 27px,
+    rgba(180,140,80,0.07) 28px
+  );
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+.intro-letterhead {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--parchment);
+}
+
+.intro-firm {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--walnut);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.intro-firm-sub {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--brass);
+  margin-top: 2px;
+}
+
+.intro-salutation {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--dark-oak);
+  margin-bottom: 14px;
+}
+
+.intro-body {
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--dark-oak);
+  margin-bottom: 12px;
+}
+
+.intro-body em {
+  font-style: italic;
+  color: var(--walnut);
+}
+
+.intro-quote {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--walnut);
+  line-height: 1.6;
+  border-left: 3px solid var(--aged-gold);
+  padding: 8px 16px;
+  margin: 16px 0;
+  background: rgba(196,154,60,0.06);
+  border-radius: 0 4px 4px 0;
+}
+
+.intro-closing {
+  margin-top: 20px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--dark-oak);
+  line-height: 1.8;
+}
+
+.intro-signature {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--walnut);
+  display: block;
+  margin-top: 2px;
+}
+
+.intro-role {
+  font-size: 0.82rem;
+  color: var(--brass);
+}
+
+.intro-divider {
+  text-align: center;
+  color: var(--aged-gold);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  margin-top: 20px;
+  opacity: 0.6;
+}
+
+/* ── Continue button below the letter ── */
+
+.intro-continue-btn {
+  margin-top: 20px;
+  padding: 14px 32px;
+  background: linear-gradient(145deg, var(--brass), var(--aged-gold));
+  color: var(--dark-oak);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border: 2px solid var(--aged-gold);
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.intro-continue-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+.intro-continue-btn:active {
+  transform: translateY(0);
+}

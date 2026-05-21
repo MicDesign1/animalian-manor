@@ -1,0 +1,334 @@
+/* ═══════════════════════════════════════════
+   PROFILE PICKER — Who's playing?
+   ═══════════════════════════════════════════ */
+
+.picker-page {
+  width: 100vw;
+  min-height: 100vh;
+  background: var(--dark-oak);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 60px;
+  overflow: auto;
+}
+
+/* ── Header ── */
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.picker-ornament {
+  color: var(--aged-gold);
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+.picker-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 700;
+  color: var(--aged-gold);
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.picker-sub {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--parchment);
+  opacity: 0.7;
+  margin-bottom: 36px;
+}
+
+/* ── Profile list ── */
+
+.picker-list {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+/* ── Individual profile card ── */
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--cream);
+  border: 2px solid var(--parchment);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.profile-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  border-color: var(--aged-gold);
+}
+
+.profile-card:active {
+  transform: translateY(-1px);
+}
+
+.profile-card-portrait {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.profile-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.profile-card-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dark-oak);
+}
+
+.profile-card-title {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--walnut);
+}
+
+.profile-card-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--walnut);
+  color: var(--aged-gold);
+  border-radius: 8px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+.profile-badge-num {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.profile-badge-lbl {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+/* ── Delete button (shown on card hover) ── */
+
+.profile-delete-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: transparent;
+  color: transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+  margin-left: 6px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Reveal the ✕ when hovering the parent card */
+.profile-card:hover .profile-delete-btn {
+  color: #a83232;
+  border-color: #a83232;
+  background: rgba(168, 50, 50, 0.08);
+}
+
+.profile-delete-btn:hover {
+  background: #a83232 !important;
+  color: #fff !important;
+  transform: scale(1.15);
+}
+
+/* ── Add new player button ── */
+
+.picker-add-btn {
+  padding: 13px 32px;
+  background: transparent;
+  color: var(--aged-gold);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border: 2px solid var(--aged-gold);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+
+.picker-add-btn:hover {
+  background: var(--aged-gold);
+  color: var(--dark-oak);
+  transform: translateY(-2px);
+}
+
+.picker-add-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Replay intro button ── */
+
+.picker-intro-btn {
+  margin-top: 14px;
+  padding: 10px 24px;
+  background: transparent;
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(232, 201, 160, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.picker-intro-btn:hover {
+  opacity: 1;
+  border-color: var(--parchment);
+  transform: translateY(-1px);
+}
+
+/* ── Delete confirmation overlay ── */
+
+.picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+
+.picker-modal {
+  background: var(--cream);
+  border: 3px solid var(--walnut);
+  border-radius: 10px;
+  max-width: 420px;
+  width: 100%;
+  padding: 32px 28px 28px;
+  text-align: center;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.picker-modal-seal {
+  font-size: 2rem;
+  color: #a83232;
+  line-height: 1;
+}
+
+.picker-modal-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--dark-oak);
+  letter-spacing: 0.04em;
+}
+
+.picker-modal-body {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--walnut);
+  line-height: 1.55;
+}
+
+.picker-modal-warning {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #a83232;
+  background: rgba(168, 50, 50, 0.08);
+  border: 1px solid rgba(168, 50, 50, 0.3);
+  border-radius: 5px;
+  padding: 7px 14px;
+  width: 100%;
+}
+
+.picker-modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.picker-modal-cancel,
+.picker-modal-confirm {
+  flex: 1;
+  padding: 11px 16px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.15s;
+}
+
+.picker-modal-cancel {
+  background: var(--walnut);
+  color: var(--aged-gold);
+  border: 2px solid var(--walnut);
+}
+
+.picker-modal-cancel:hover {
+  background: var(--dark-oak);
+  transform: translateY(-1px);
+}
+
+.picker-modal-confirm {
+  background: transparent;
+  color: #a83232;
+  border: 2px solid #a83232;
+}
+
+.picker-modal-confirm:hover {
+  background: #a83232;
+  color: #fff;
+  transform: translateY(-1px);
+}
