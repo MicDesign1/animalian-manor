@@ -519,13 +519,15 @@ function MiniCard({ creature, mode, coins, onBuy, onSell, canSell = true, onSele
         </button>
       )}
       {mode === 'sell' && (
-        <button
-          className={`pmc-btn pmc-btn--sell${!canSell ? ' pmc-btn--disabled' : ''}`}
-          onClick={e => { e.stopPropagation(); if (canSell) onSell(creature); }}
-          disabled={!canSell}
-        >
-          Sell · {Math.max(5, Math.floor(creature.hp / 5))} 🪙
-        </button>
+        creature.isLegendary
+          ? <span className="pmc-btn pmc-btn--disabled pmc-btn--legendary" title="Legendary — cannot be sold">Legendary — cannot be sold</span>
+          : <button
+              className={`pmc-btn pmc-btn--sell${!canSell ? ' pmc-btn--disabled' : ''}`}
+              onClick={e => { e.stopPropagation(); if (canSell) onSell(creature); }}
+              disabled={!canSell}
+            >
+              Sell · {Math.max(5, Math.floor(creature.hp / 5))} 🪙
+            </button>
       )}
     </div>
   );
@@ -1251,6 +1253,7 @@ export default function Parlor() {
   }
 
   function handleSellRequest(creature) {
+    if (creature.isLegendary) return;
     const offer     = getMiraOffer(creature, dailySales, playerName);
     const shelfFull = miraShop.buyback.length >= BUYBACK_LIMIT;
     setPendingSell({ creature, offer, shelfFull });

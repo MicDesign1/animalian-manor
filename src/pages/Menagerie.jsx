@@ -162,13 +162,15 @@ export default function Menagerie() {
 
                     {/* ✕ button — appears on hover, opens the confirmation overlay */}
                     {!isConfirm && (
-                      <button
-                        className="release-btn"
-                        onClick={() => setPendingDeleteId(creature.id)}
-                        title="Remove this creature"
-                      >
-                        ✕
-                      </button>
+                      creature.isLegendary
+                        ? <span className="release-btn release-btn--locked" title="Uncle Argon's legendary creature — cannot be released">🔒</span>
+                        : <button
+                            className="release-btn"
+                            onClick={() => setPendingDeleteId(creature.id)}
+                            title="Remove this creature"
+                          >
+                            ✕
+                          </button>
                     )}
 
                     {/* Confirmation overlay */}

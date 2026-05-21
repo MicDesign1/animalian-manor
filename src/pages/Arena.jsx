@@ -755,17 +755,19 @@ export default function Arena() {
                       </div>
                     )}
 
-                    {/* Field training — always offered after a win */}
-                    <div className="winner-levelups">
-                      <p className="winner-levelup-headline">🏋️ Field Training</p>
-                      <p className="winner-field-hint">Your creatures gained experience in battle.</p>
-                      <button
-                        className="winner-redist-btn"
-                        onClick={() => setShowFieldTraining(true)}
-                      >
-                        ✦ Allocate 5 Bonus Points
-                      </button>
-                    </div>
+                    {/* Field training — only offered when at least one non-legendary participated */}
+                    {fieldParticipants.length > 0 && (
+                      <div className="winner-levelups">
+                        <p className="winner-levelup-headline">🏋️ Field Training</p>
+                        <p className="winner-field-hint">Your creatures gained experience in battle.</p>
+                        <button
+                          className="winner-redist-btn"
+                          onClick={() => setShowFieldTraining(true)}
+                        >
+                          ✦ Allocate 5 Bonus Points
+                        </button>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <>

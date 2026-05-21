@@ -11,14 +11,11 @@
   padding-bottom: var(--bottom-bar-height);
   display: flex;
   flex-direction: column;
-  background: var(--dark-oak);
-
-  /* Subtle radial glow, like light coming through a greenhouse roof */
-  background-image: radial-gradient(
-    ellipse 80% 40% at 50% 0%,
-    rgba(92, 58, 30, 0.55) 0%,
-    transparent 70%
-  );
+  background-color: var(--dark-oak);
+  background-image: url('/backgrounds/menagerie-garden.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 
@@ -33,7 +30,8 @@
   padding: 0 24px;
   height: 60px;
   flex-shrink: 0;
-  background: var(--walnut);
+  background-color: rgba(44, 24, 16, 0.6);
+  backdrop-filter: blur(4px);
   border-bottom: 2px solid var(--brass);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
   gap: 12px;
@@ -206,8 +204,9 @@
   font-family: var(--font-body);
   font-style: italic;
   font-size: 0.78rem;
-  color: var(--parchment);
-  opacity: 0.38;
+  color: var(--cream);
+  opacity: 0.85;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 }
 
 .sort-type-btn {
@@ -216,8 +215,8 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   color: var(--aged-gold);
-  background: transparent;
-  border: 1px solid rgba(196, 154, 60, 0.35);
+  background: rgba(28, 14, 8, 0.55);
+  border: 1px solid rgba(196, 154, 60, 0.7);
   border-radius: 6px;
   padding: 6px 14px;
   cursor: pointer;
@@ -226,7 +225,7 @@
 }
 
 .sort-type-btn:hover {
-  background: rgba(196, 154, 60, 0.12);
+  background: rgba(28, 14, 8, 0.75);
   border-color: var(--aged-gold);
 }
 
@@ -241,6 +240,7 @@
   gap: 28px;
   justify-content: center;
   width: 100%;
+  background-color: rgba(245, 240, 225, 0.15);
 }
 
 /* Each slot holds the card + the release button */
@@ -329,6 +329,20 @@
   background: #8B2500;
   border-color: #8B2500;
   color: #fff;
+}
+
+.release-btn--locked {
+  cursor: default;
+  font-size: 0.75rem;
+  background: var(--cream);
+  border-color: #C49A3C;
+  color: #C49A3C;
+}
+
+.release-btn--locked:hover {
+  background: var(--cream);
+  border-color: #C49A3C;
+  color: #C49A3C;
 }
 
 

@@ -738,6 +738,20 @@
 }
 .pmc-btn:hover:not(:disabled) { filter: brightness(1.1); }
 .pmc-btn--disabled { opacity: 0.4; cursor: not-allowed; }
+.pmc-btn--legendary {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 0.65rem;
+  color: #C49A3C;
+  background: transparent;
+  border: 1px solid #8B6914;
+  border-radius: 6px;
+  opacity: 1;
+  cursor: default;
+  text-align: center;
+  display: block;
+  padding: 5px 8px;
+}
 .pmc-btn--sell {
   background: linear-gradient(135deg, #7A4820, #5C3A1E);
   color: var(--parchment);
