@@ -251,27 +251,135 @@ const MIRA_QUIPS = {
 
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
+const NPC_LINES_STAGED = {
+  barkeep: {
+    new: [
+      "Welcome, welcome. Pull up a stool. You must be Argon's heir — you've got his eyes.",
+      "He used to sit right there in the corner booth, filling that old journal for hours. Never said what he was writing.",
+      "Rumour has it the trophy room holds more than trophies, if you catch my meaning.",
+      "If you're looking to trade, Mira's your person. Sharp as a brass tack, that one. Fair, though.",
+      "One last thing — if you find yourself in the study late at night, best not to pull on books at random. Or maybe do. Heh.",
+    ],
+    early: [
+      "Word travels fast around here. They're saying the heir's been making a name in the Arena.",
+      "Your uncle had the same fire in his early days. Won every match for six months straight. Wonderful times.",
+      "Mira tells me you've been in her corner a few times. Good taste — she finds creatures nobody else can.",
+      "The Scholar gets a bit excited when new visitors arrive. Don't let him lecture you past closing time.",
+      "I've heard your creatures fight well. That's the sort of thing your uncle would've loved to know.",
+    ],
+    mid: [
+      "You heard about Crogan? Thick-necked fellow, used to come in here demanding free rounds. He's gone quiet lately. Something to do with you, I'd wager.",
+      "The village market's breathing easier since Crogan stopped showing up. You did good, even if you won't say so.",
+      "Some of the older regulars have been asking about you. You're becoming part of the furniture here, in the best way.",
+      "Your uncle always said this place needed someone who'd actually fight for it. Seems he was right.",
+      "The notice board's seen a few fewer WANTED signs lately. I suspect that's your doing too.",
+    ],
+    late: [
+      "Strange nights lately. I keep hearing things below the manor — deep in the walls, almost. Probably nothing. Probably.",
+      "One of the kitchen staff swore she heard footsteps beneath the cellar last week. I told her it was old pipes. I'm not entirely sure I believe that.",
+      "Your uncle's last letters mentioned something about a discovery. He didn't elaborate. He was always careful with his words near the end.",
+      "There's a kind of tension in this place now, has been for weeks. Like the manor is waiting for something.",
+      "Whatever you've been chasing, you're close. I can feel it the way you feel weather before it turns. Keep going.",
+    ],
+    postgame: [
+      "There it is. I always knew you'd see it through — same as Argon would have wanted.",
+      "The manor feels different today. Lighter, somehow. Like it's been holding its breath for years and finally let go.",
+      "I've served drinks in this parlour for thirty years. I've never seen anything like what you've managed. Not once.",
+      "Whatever that thing was that you faced down there — it's gone now. The whole village feels it, even if they don't know why.",
+      "Your uncle would've been proud. Genuinely. Now sit down and let me get you something warm — you've earned it.",
+    ],
+  },
+  collector: {
+    new: [
+      "So you're Argon's {title}! He talked about you all the time! I collect creatures too — well, trying to.",
+      "I got up to fourteen cards before my Thornback escaped. Don't ask how a card escapes. It was a whole thing.",
+      "Your uncle once told me the best secrets are hidden in plain sight. Right where you'd never think to look.",
+      "He specifically mentioned the study. Said the real adventure starts with the right book. Weird, right?",
+    ],
+    early: [
+      "Wait — you've been winning actual Arena matches? That's incredible. My best streak is three and I told everyone about it for a week.",
+      "Which creatures have you got so far? I've been trying to find a Galehawk for ages — the speed on those things is unreal.",
+      "Mira's stock changes all the time, right? I keep visiting but she never has what I'm looking for. Story of my life.",
+      "I heard Phantom types are stronger than anything at full power. Have you faced one yet? What was it like?",
+      "You're actually doing it. Like, for real. I'm kind of in awe right now.",
+    ],
+    mid: [
+      "Hey, have you heard about Crogan? Someone at the market said a young trainer from the manor beat him. Was that you?",
+      "If it was you who stopped Crogan — the village traders are all talking about it. You're basically a legend now.",
+      "I tried to build an Ember team but I keep losing to Tide. Do you just stack your types or mix them up?",
+      "My collection's up to twenty-two now! Still no Galehawk though. I'm starting to think they don't exist.",
+      "Every time I come in here I hear a new story about what you've been up to. It's wild. You're like, actually famous.",
+    ],
+    late: [
+      "Okay, I have to ask — do you ever get a weird feeling in the manor at night? Like something's... watching?",
+      "I visited the menagerie last week and two of my cards just started acting strange. Trembling in their cases. I've never seen that before.",
+      "Something's wrong, isn't it. I can tell by the way people are acting around here. Even Elias looks worried.",
+      "I keep hearing this low sound, like — I don't know, like something breathing, coming up through the floor. Please tell me you know what that is.",
+      "You're still collecting, right? Still battling? Good. Whatever's going on, I feel safer knowing you're here.",
+    ],
+    postgame: [
+      "WAIT. Was that — did you actually — there was something HUGE going on and you defeated it, didn't you?!",
+      "I need you to tell me everything. From the beginning. Every single thing. I have snacks. We have time.",
+      "You actually went into the basement and came back. I didn't even know you could come back from that.",
+      "My whole collection feels different now. Like the cards know something changed. Is that weird? That's probably weird.",
+      "You're officially the most interesting person I've ever met. And I once met a creature merchant who'd been bitten by every type. So that's saying something.",
+    ],
+  },
+  scholar: {
+    new: [
+      "Ah, a new student of the natural sciences! Do sit. There is always room at a scholar's table.",
+      "The six elemental types were first catalogued by the explorer Isadora Venn in 1847. Fascinating woman. Dreadful handwriting.",
+      "Phantom-type creatures are the most enigmatic — they seem to draw power from uncertainty itself. Most unsettling.",
+      "Ember overcomes Thorn, Thorn overcomes Tide, Tide overcomes Ember. The eternal triangle. Storm breaks the pattern entirely.",
+      "Your uncle's collection was unprecedented. Some specimens he described... I confess I thought him fanciful. I no longer do.",
+    ],
+    early: [
+      "Type advantage is the cornerstone of battle strategy. A Tide creature against an Ember opponent deals fifty percent more damage. That alone can decide a match.",
+      "Iron types are often underestimated. They carry no elemental weakness — but equally no advantage. Reliable in the way that a good stone wall is reliable.",
+      "Storm types are peculiar. Dominant against Tide, but Thorn tangles them badly. Trainers who use Storm rely on speed — strike first, ask questions later.",
+      "Phantom types deal twenty-five percent extra damage to everything. The tradeoff is they take twenty-five percent more in return. High risk. High reward.",
+      "I always advise new trainers: build your first team around type coverage, not individual strength. A well-rounded team beats a powerful one-note team every time.",
+    ],
+    mid: [
+      "I have been developing a theory — what if a creature could express two elemental types simultaneously? Not alternating. Both, at once. The mathematics are extraordinary.",
+      "Consider: if Ember and Thorn coexisted in a single specimen, the opposing advantages would create an internal tension. Either catastrophically unstable — or transcendently powerful.",
+      "Your uncle's notes referenced something called the 'convergence point' — a location where type boundaries break down. I dismissed it as poetry. I am less certain now.",
+      "There are creatures your uncle catalogued that do not fit any of the six known types. I have catalogued seventeen such anomalies. Each one makes my taxonomy weaker and more interesting.",
+      "Dual-type theory is currently considered fringe science. I suspect that in twenty years it will be considered foundational. That is usually how it goes.",
+    ],
+    late: [
+      "The deeper one studies elemental theory, the more one suspects that the six types are not the source — merely the symptoms. Something underlies them. Something older.",
+      "There are accounts — suppressed, mostly, from the 1890s — of creatures that existed before the type system was understood. The descriptions do not match any known category.",
+      "I have been running calculations on the energy readings your uncle sent back from his final expedition. The numbers should not be possible. And yet.",
+      "Some creatures, I believe, do not originate in the natural world as we understand it. They arrive from somewhere else. Through somewhere else. The mathematics suggest a membrane of some kind.",
+      "I will say this plainly: if you find something in this manor that defies classification — do not assume it is harmless. Unprecedented things rarely are.",
+    ],
+    postgame: [
+      "So. The convergence point was real. I owe your uncle a very significant apology.",
+      "What you encountered — I have been trying to classify it since you described it. My best term is 'origin-class.' A creature that predates the type system entirely. Possibly predates the manor.",
+      "The academic world will not believe this for at least a decade. I intend to publish regardless. I have nothing left to lose by being right.",
+      "There is a strange irony: the most important discovery in elemental history was made not by a scholar, but by an heir who simply refused to leave well enough alone.",
+      "Well done. Genuinely. Now — if you could write down everything you remember, in order, with as much detail as possible — I have paper. I have time. And a great deal of questions.",
+    ],
+  },
+};
+
+function getProgressStage() {
+  if (getStoryFlag('masked-man-defeated')) return 'postgame';
+  const wins = getBattlesWon();
+  if (wins >= 100) return 'late';
+  if (wins >= 25)  return 'mid';
+  if (wins >= 5)   return 'early';
+  return 'new';
+}
+
+function getNpcLines(npcKey, playerTitle) {
+  const lines = NPC_LINES_STAGED[npcKey][getProgressStage()];
+  if (!playerTitle) return lines;
+  return lines.map(l => l.replace('{title}', playerTitle));
+}
+
 const NPC_LINES = {
-  barkeep: [
-    "Welcome, welcome. Pull up a stool. You must be Argon's heir — you've got his eyes.",
-    "He used to sit right there in the corner booth, filling that old journal for hours. Never said what he was writing.",
-    "Rumour has it the trophy room holds more than trophies, if you catch my meaning.",
-    "If you're looking to trade, Mira's your person. Sharp as a brass tack, that one. Fair, though.",
-    "One last thing — if you find yourself in the study late at night, best not to pull on books at random. Or maybe do. Heh.",
-  ],
-  scholar: [
-    "Ah, a new student of the natural sciences! Do sit. There is always room at a scholar's table.",
-    "The six elemental types were first catalogued by the explorer Isadora Venn in 1847. Fascinating woman.",
-    "Phantom-type creatures are the most enigmatic — they seem to draw power from uncertainty itself.",
-    "Ember overcomes Thorn, Thorn overcomes Tide, Tide overcomes Ember. The eternal triangle. Storm breaks patterns.",
-    "Your uncle's collection was unprecedented. Some specimens he described... I confess I thought him fanciful. I no longer do.",
-  ],
-  collector: [
-    "Oh! You're Argon's niece/nephew? He talked about you all the time! I collect creatures too — well, trying to.",
-    "I got up to fourteen cards before my Thornback escaped. Don't ask how a card escapes. It was a whole thing.",
-    "Your uncle once told me the best secrets are hidden in plain sight. Right where you'd never think to look.",
-    "He specifically mentioned the study. Said the real adventure starts with the right book. Weird, right?",
-  ],
   mystery: [
     "...",
     "You should not be speaking to me. And yet here we both are.",
@@ -988,7 +1096,8 @@ export default function Parlor() {
   const [selectedCard, setSelectedCard] = useState(null); // card being inspected → Mira commentary
   const [, tick]                        = useState(0); // triggers countdown re-render
 
-  const playerName = getActiveProfile()?.name ?? 'friend';
+  const playerName  = getActiveProfile()?.name ?? 'friend';
+  const playerTitle = getActiveProfile()?.title === 'niece' ? 'niece' : 'nephew';
 
   const [wrenStep, setWrenStep] = useState(null); // null | 0 (journal StoryLetter)
 
@@ -1314,7 +1423,7 @@ export default function Parlor() {
               <div className="parlor-npc-role">Barkeep</div>
             </div>
           </div>
-          <NpcPanel npcId="barkeep" lines={NPC_LINES.barkeep} onClose={() => setActiveZone(null)} />
+          <NpcPanel npcId="barkeep" lines={getNpcLines('barkeep')} onClose={() => setActiveZone(null)} />
         </div>
       )}
 
@@ -1514,7 +1623,7 @@ export default function Parlor() {
               <div className="parlor-npc-role">Natural Historian</div>
             </div>
           </div>
-          <NpcPanel npcId="scholar" lines={NPC_LINES.scholar} onClose={() => setActiveZone(null)} />
+          <NpcPanel npcId="scholar" lines={getNpcLines('scholar')} onClose={() => setActiveZone(null)} />
         </div>
       )}
 
@@ -1529,7 +1638,7 @@ export default function Parlor() {
               <div className="parlor-npc-role">Young Collector</div>
             </div>
           </div>
-          <NpcPanel npcId="collector" lines={NPC_LINES.collector} onClose={() => setActiveZone(null)} />
+          <NpcPanel npcId="collector" lines={getNpcLines('collector', playerTitle)} onClose={() => setActiveZone(null)} />
         </div>
       )}
 
