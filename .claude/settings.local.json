@@ -12,7 +12,8 @@
       "Bash(node -e ' *)"
     ],
     "additionalDirectories": [
-      "d:\\KID GAME\\project\\animalian-manor\\src"
+      "d:\\KID GAME\\project\\animalian-manor\\src",
+      "d:\\KID GAME\\web"
     ]
   }
 }
