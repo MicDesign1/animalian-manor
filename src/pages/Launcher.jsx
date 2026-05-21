@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProfiles, getActiveProfileName, migrateExistingData } from '../data/profiles';
+import { getProfiles, getActiveProfileName, migrateExistingData, isIntroSeen } from '../data/profiles';
 
 // Entry point — runs migration then redirects to the right screen.
 // The user should never see this component for more than a flash.
@@ -15,7 +15,7 @@ export default function Launcher() {
     let next;
     if (profiles.length === 0) next = '/create-player';
     else if (!active || !profiles.find(p => p.name === active)) next = '/profile-picker';
-    else next = '/manor';
+    else next = isIntroSeen() ? '/manor' : '/intro';
 
     sessionStorage.setItem('splash-next', next);
     navigate('/splash', { replace: true });

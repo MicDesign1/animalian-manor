@@ -26,6 +26,43 @@
 }
 
 
+/* ── Player chip ── */
+
+.bar-player-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(196, 154, 60, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.bar-player-chip:hover {
+  background: rgba(196, 154, 60, 0.15);
+  border-color: var(--aged-gold);
+}
+
+.bar-player-portrait {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.bar-player-name {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--cream);
+  white-space: nowrap;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 /* ── Current room ── */
 
 .bar-location {
@@ -225,6 +262,7 @@
 /* ── Responsive: hide text labels on very small screens ── */
 
 @media (max-width: 480px) {
+  .bar-player-name   { display: none; }
   .bar-location-name { display: none; }
   .bar-stat-label    { display: none; }
   .bar-nav-label     { display: none; }

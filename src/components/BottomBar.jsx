@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
-import { profileKey } from '../data/profiles';
+import { profileKey, getActiveProfile, PORTRAITS } from '../data/profiles';
 import SettingsModal from './SettingsModal';
 import './BottomBar.css';
 
@@ -47,12 +47,14 @@ export default function BottomBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [stats, setStats] = useState(readStats);
+  const [profile, setProfile] = useState(getActiveProfile);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const canFullscreen = fsAPI.supported();
 
   useEffect(() => {
     setStats(readStats());
+    setProfile(getActiveProfile());
   }, [location.pathname]);
 
   useEffect(() => {
@@ -77,6 +79,20 @@ export default function BottomBar() {
   return (
     <>
     <nav className="bottom-bar" aria-label="Game HUD">
+
+      {profile && (
+        <>
+          <button
+            className="bar-player-chip"
+            onClick={() => navigate('/profile-picker')}
+            title="Switch profile"
+          >
+            <span className="bar-player-portrait">{PORTRAITS[profile.portrait]?.emoji ?? '🐾'}</span>
+            <span className="bar-player-name">{profile.name}</span>
+          </button>
+          <div className="bar-rule" aria-hidden />
+        </>
+      )}
 
       <div className="bar-location">
         <span className="bar-location-icon">{room.icon}</span>
