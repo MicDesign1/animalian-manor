@@ -180,6 +180,12 @@ export default function Arena() {
   const [redistCreature, setRedistCreature]  = useState(null);
   const [redistStats,    setRedistStats]     = useState(null);
 
+  // ── Field-training state (fires after every win) ──
+  const [fieldParticipants,  setFieldParticipants]  = useState([]);
+  const [showFieldTraining,  setShowFieldTraining]  = useState(false);
+  const [fieldCreature,      setFieldCreature]      = useState(null);
+  const [fieldStats,         setFieldStats]         = useState(null);
+
   // Mutable ref for async-safe reads inside setTimeout callbacks.
   const b = useRef(null);
 
@@ -253,7 +259,17 @@ export default function Arena() {
     // Use the attack's own type for the hit SFX (important for dual-type creatures).
     AudioManager.playHit(attack.type, dmg, defender.hp);
     const mult = getMultiplier(attack.type, defender.type, defender.dualType);
-    const tag  = mult > 1 ? ' ✨ Super effective!' : mult < 1 ? ' 😬 Not very effective…' : '';
+    const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
+    let tag = '';
+    if (mult > 1) {
+      tag = attack.type?.toLowerCase() === 'phantom'
+        ? ' ✨ Phantom strikes all types harder!'
+        : ` ✨ ${cap(attack.type)} is strong against ${cap(defender.type)}!`;
+    } else if (mult < 1) {
+      tag = defender.type?.toLowerCase() === 'phantom'
+        ? ' 😬 Phantom absorbs some of that damage.'
+        : ` 😬 ${cap(defender.type)} resists that attack.`;
+    }
     addLog(
       `${attacker.name} used ${attack.name}! Dealt ${dmg} damage.${tag}`,
       isPlayer ? 'player' : 'enemy'
@@ -393,9 +409,16 @@ export default function Arena() {
 
       if (lvlUps.length > 0) {
         setLevelUps(lvlUps);
-        setRedistCreature(lvlUps[0]);
-        setRedistStats({ hp: lvlUps[0].hp, atk: lvlUps[0].atk, def: lvlUps[0].def, spd: lvlUps[0].spd });
+        // Legendary creatures' stats are fixed — skip their redist slot
+        const firstEligible = lvlUps.find(c => !c.isLegendary);
+        if (firstEligible) {
+          setRedistCreature(firstEligible);
+          setRedistStats({ hp: firstEligible.hp, atk: firstEligible.atk, def: firstEligible.def, spd: firstEligible.spd });
+        }
       }
+
+      // Field training always fires after a win — one creature, +5 points
+      setFieldParticipants(updatedCreatures.filter(c => participatedIds.has(c.id)));
 
       AudioManager.playSfx('/sounds/crowd-cheer.mp3');
     } else {
@@ -405,6 +428,21 @@ export default function Arena() {
     setWinner(side);
     setPhase('finished');
     setBusy(false);
+  }
+
+  // ── Confirm field-training bonus (+5 points) for one creature ────────────
+  function handleFieldConfirm() {
+    const allCreatures = JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]');
+    const updated = allCreatures.map(c =>
+      c.id === fieldCreature.id
+        ? { ...c, hp: fieldStats.hp, currentHp: fieldStats.hp,
+            atk: fieldStats.atk, def: fieldStats.def, spd: fieldStats.spd }
+        : c
+    );
+    localStorage.setItem(profileKey('creatures'), JSON.stringify(updated));
+    setShowFieldTraining(false);
+    setFieldCreature(null);
+    setFieldStats(null);
   }
 
   // ── Confirm stat redistribution for one leveled-up creature ──────────────
@@ -419,9 +457,9 @@ export default function Arena() {
     );
     localStorage.setItem(profileKey('creatures'), JSON.stringify(updated));
 
-    const nextIdx = levelUps.findIndex(c => c.id === redistCreature.id) + 1;
-    if (nextIdx < levelUps.length) {
-      const next = levelUps[nextIdx];
+    const currentIdx = levelUps.findIndex(c => c.id === redistCreature.id);
+    const next = levelUps.slice(currentIdx + 1).find(c => !c.isLegendary);
+    if (next) {
       setRedistCreature(next);
       setRedistStats({ hp: next.hp, atk: next.atk, def: next.def, spd: next.spd });
     } else {
@@ -448,6 +486,10 @@ export default function Arena() {
     setShowRedist(false);
     setRedistCreature(null);
     setRedistStats(null);
+    setFieldParticipants([]);
+    setShowFieldTraining(false);
+    setFieldCreature(null);
+    setFieldStats(null);
     b.current = null;
   }
 
@@ -459,11 +501,21 @@ export default function Arena() {
   const strongIdx = playerActive ? getStrongIdx(playerActive.attacks) : -1;
 
   // Level-up redistribution derived values
-  const redistPool      = redistCreature ? 200 + ((redistCreature.level || 1) - 1) * 10 : 200;
+  const redistEligible  = levelUps.filter(c => !c.isLegendary);
+  const redistPool      = redistCreature ? 200 + ((redistCreature.level || 1) - 1) * 20 : 200;
   const redistUsed      = redistStats
     ? (redistStats.hp - 50) + (redistStats.atk - 10) + (redistStats.def - 10) + (redistStats.spd - 10)
     : 0;
   const redistRemaining = redistPool - redistUsed;
+
+  // Field-training derived values — +5 bonus on top of whatever the creature already has
+  const fieldPool = fieldCreature
+    ? (fieldCreature.hp - 50) + (fieldCreature.atk - 10) + (fieldCreature.def - 10) + (fieldCreature.spd - 10) + 5
+    : 0;
+  const fieldUsed = fieldStats
+    ? (fieldStats.hp - 50) + (fieldStats.atk - 10) + (fieldStats.def - 10) + (fieldStats.spd - 10)
+    : 0;
+  const fieldRemaining = fieldPool - fieldUsed;
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -692,14 +744,28 @@ export default function Arena() {
                             <span className="winner-levelup-badge">Lv {c.level}</span>
                           </p>
                         ))}
-                        <button
-                          className="winner-redist-btn"
-                          onClick={() => setShowRedist(true)}
-                        >
-                          ✦ Redistribute Stats
-                        </button>
+                        {redistCreature && (
+                          <button
+                            className="winner-redist-btn"
+                            onClick={() => setShowRedist(true)}
+                          >
+                            ✦ Redistribute Stats
+                          </button>
+                        )}
                       </div>
                     )}
+
+                    {/* Field training — always offered after a win */}
+                    <div className="winner-levelups">
+                      <p className="winner-levelup-headline">🏋️ Field Training</p>
+                      <p className="winner-field-hint">Your creatures gained experience in battle.</p>
+                      <button
+                        className="winner-redist-btn"
+                        onClick={() => setShowFieldTraining(true)}
+                      >
+                        ✦ Allocate 5 Bonus Points
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -727,6 +793,76 @@ export default function Arena() {
       )}
 
       {/* ══ LEVEL-UP STAT REDISTRIBUTION OVERLAY ═════════════════════════════ */}
+      {/* ══ FIELD TRAINING OVERLAY ═══════════════════════════════════════════ */}
+      {showFieldTraining && (
+        <div className="redist-overlay">
+          <div className="redist-panel">
+            <span className="redist-star">🏋️</span>
+            <h2 className="redist-title">Field Training!</h2>
+            <p className="redist-hint">Field training complete! Allocate 5 bonus points to a creature that fought.</p>
+
+            {!fieldCreature ? (
+              <div className="field-pick-list">
+                {fieldParticipants.map(c => (
+                  <button
+                    key={c.id}
+                    className="field-pick-btn"
+                    onClick={() => {
+                      setFieldCreature(c);
+                      setFieldStats({ hp: c.hp, atk: c.atk, def: c.def, spd: c.spd });
+                    }}
+                  >
+                    {c.name}
+                    <span className="field-pick-level">Lv {c.level || 1}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <>
+                <p className="redist-creature-name">{fieldCreature.name}</p>
+
+                <div className="redist-pool-row">
+                  <span className="redist-pool-label">Points remaining</span>
+                  <span
+                    className="redist-pool-value"
+                    style={{ color: fieldRemaining === 0 ? '#8B2500' : '#C49A3C' }}
+                  >
+                    {fieldRemaining} / {fieldPool}
+                  </span>
+                </div>
+
+                <div className="redist-sliders">
+                  <RedistSlider
+                    label="HP"  value={fieldStats.hp}  min={50}  max={200}
+                    onChange={v => setFieldStats(s => ({ ...s, hp: v }))}
+                    remaining={fieldRemaining}
+                  />
+                  <RedistSlider
+                    label="ATK" value={fieldStats.atk} min={10}  max={100}
+                    onChange={v => setFieldStats(s => ({ ...s, atk: v }))}
+                    remaining={fieldRemaining}
+                  />
+                  <RedistSlider
+                    label="DEF" value={fieldStats.def} min={10}  max={100}
+                    onChange={v => setFieldStats(s => ({ ...s, def: v }))}
+                    remaining={fieldRemaining}
+                  />
+                  <RedistSlider
+                    label="SPD" value={fieldStats.spd} min={10}  max={100}
+                    onChange={v => setFieldStats(s => ({ ...s, spd: v }))}
+                    remaining={fieldRemaining}
+                  />
+                </div>
+
+                <button className="redist-confirm-btn" onClick={handleFieldConfirm}>
+                  ✦ Confirm Training
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {showRedist && redistCreature && redistStats && (
         <div className="redist-overlay">
           <div className="redist-panel">
@@ -773,9 +909,9 @@ export default function Arena() {
               ✦ Confirm Stats
             </button>
 
-            {levelUps.length > 1 && (
+            {redistEligible.length > 1 && (
               <p className="redist-progress">
-                Creature {levelUps.findIndex(c => c.id === redistCreature.id) + 1} of {levelUps.length}
+                Creature {redistEligible.findIndex(c => c.id === redistCreature.id) + 1} of {redistEligible.length}
               </p>
             )}
           </div>

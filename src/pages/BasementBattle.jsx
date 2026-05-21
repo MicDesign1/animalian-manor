@@ -15,11 +15,11 @@ const RZ_BASE = {
   name:      'RZ',
   type:      'iron',
   dualType:  'tide',
-  hp: 250, atk: 90, def: 80, spd: 45,
-  level: 7,
+  hp: 320, atk: 115, def: 105, spd: 55,
+  level: 9,
   attacks: [
-    { name: 'Tidal Crush',  damage: 55, type: 'tide' },
-    { name: 'Iron Torrent', damage: 50, type: 'iron' },
+    { name: 'Tidal Crush',  damage: 70, type: 'tide' },
+    { name: 'Iron Torrent', damage: 65, type: 'iron' },
   ],
   isLegendary: true,
   image: LEGENDARY_ART_PATHS.rz,
@@ -178,7 +178,17 @@ export default function BasementBattle() {
     const dmg  = calcDamage(attacker, attack, defender);
     AudioManager.playHit(attack.type, dmg, defender.hp);
     const mult = getMultiplier(attack.type, defender.type, defender.dualType);
-    const tag  = mult > 1 ? ' ✨ Super effective!' : mult < 1 ? ' 😬 Not very effective…' : '';
+    const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
+    let tag = '';
+    if (mult > 1) {
+      tag = attack.type?.toLowerCase() === 'phantom'
+        ? ' ✨ Phantom strikes all types harder!'
+        : ` ✨ ${cap(attack.type)} is strong against ${cap(defender.type)}!`;
+    } else if (mult < 1) {
+      tag = defender.type?.toLowerCase() === 'phantom'
+        ? ' 😬 Phantom absorbs some of that damage.'
+        : ` 😬 ${cap(defender.type)} resists that attack.`;
+    }
     addLog(
       `${attacker.name} used ${attack.name}! Dealt ${dmg} damage.${tag}`,
       isPlayer ? 'player' : 'enemy'

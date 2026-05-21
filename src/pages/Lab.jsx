@@ -19,7 +19,7 @@ const TYPES = [
   { id: 'iron',    label: 'Iron',    color: '#1A1A1A', icon: '⚙️' },
 ];
 
-// Level 1 budget. Formula: 200 + (level - 1) * 10.
+// Level 1 budget. Formula: 200 + (level - 1) * 20.
 const POOL = 200;
 
 // Color swatches for the art tint picker.

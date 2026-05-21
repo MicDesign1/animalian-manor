@@ -138,9 +138,51 @@
   pointer-events: none;   /* doesn't block dragging */
 }
 
+/* Dual-type: container sits where the single badge used to, holds two smaller pills */
+.card-type-badges {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+
+/* Pills inside the dual-type container are static (not absolute) and slightly smaller */
+.card-type-badges .card-type-badge {
+  position: static;
+  font-size: 0.58rem;
+  padding: 2px 7px 2px 5px;
+}
+
 .card-type-icon {
   font-size: 0.82rem;
   line-height: 1;
+}
+
+/* ── Legendary Badge ── */
+
+.card-legendary-strip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px 4px;
+  background: var(--cream);
+  border-top: 1px solid rgba(139, 105, 20, 0.25);
+  flex-shrink: 0;
+}
+
+.card-legendary-badge {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #C49A3C;
+  letter-spacing: 0.12em;
+  border: 1px solid #8B6914;
+  border-radius: 4px;
+  padding: 1px 9px;
+  background: rgba(196, 154, 60, 0.08);
 }
 
 
@@ -227,6 +269,25 @@
   height: 28px;
   background: rgba(255, 255, 255, 0.15);
   flex-shrink: 0;
+}
+
+.card-stat--level {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+}
+
+.stat-level-stars {
+  font-size: 0.55rem;
+  line-height: 1;
+}
+
+.stat-label--level {
+  color: #C49A3C;
+  font-family: Georgia, serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  opacity: 1;
+  letter-spacing: 0.04em;
 }
 
 

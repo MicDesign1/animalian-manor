@@ -1093,6 +1093,53 @@
   letter-spacing: 0.06em;
 }
 
+/* Field training creature picker */
+.field-pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.field-pick-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--dark-oak);
+  background: linear-gradient(135deg, var(--parchment), var(--cream));
+  border: 2px solid var(--aged-gold);
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.field-pick-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.field-pick-level {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #8B6914;
+  letter-spacing: 0.04em;
+}
+
+.winner-field-hint {
+  font-family: var(--font-lore);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--parchment);
+  opacity: 0.75;
+  margin: 0;
+}
+
 
 /* ════════════════════════════════════════
    RESPONSIVE

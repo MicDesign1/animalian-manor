@@ -76,6 +76,8 @@ export default function CreatureCard({
   const {
     name,
     type = 'iron',
+    dualType,
+    isLegendary,
     hp,
     currentHp,
     image,
@@ -90,7 +92,8 @@ export default function CreatureCard({
   const xpToNext = level * 50;
   const xpPct    = Math.min(100, Math.round((xp / xpToNext) * 100));
 
-  const t = TYPE_DATA[type] || TYPE_DATA.iron;
+  const t  = TYPE_DATA[type]     || TYPE_DATA.iron;
+  const dt = dualType ? (TYPE_DATA[dualType] || null) : null;
   const displayHp = currentHp ?? hp;
 
   // Resolve display props: explicit prop > value saved on the creature object > default
@@ -194,17 +197,37 @@ export default function CreatureCard({
           }} />
         )}
 
-        {/* Type badge floats over the bottom-left of the art */}
-        <div className="card-type-badge" style={{ background: t.color }}>
-          <span className="card-type-icon">{t.icon}</span>
-          <span className="card-type-label">{t.label}</span>
-        </div>
+        {/* Type badge(s) float over the bottom-left of the art */}
+        {dt ? (
+          <div className="card-type-badges">
+            <div className="card-type-badge" style={{ background: t.color }}>
+              <span className="card-type-icon">{t.icon}</span>
+              <span className="card-type-label">{t.label}</span>
+            </div>
+            <div className="card-type-badge" style={{ background: dt.color }}>
+              <span className="card-type-icon">{dt.icon}</span>
+              <span className="card-type-label">{dt.label}</span>
+            </div>
+          </div>
+        ) : (
+          <div className="card-type-badge" style={{ background: t.color }}>
+            <span className="card-type-icon">{t.icon}</span>
+            <span className="card-type-label">{t.label}</span>
+          </div>
+        )}
 
         {/* Drag hint — only in edit mode */}
         {onArtDrag && (
           <div className="card-art-drag-hint">drag to reframe</div>
         )}
       </div>
+
+      {/* ── Legendary Badge ── */}
+      {isLegendary && (
+        <div className="card-legendary-strip">
+          <span className="card-legendary-badge">✦ Legendary</span>
+        </div>
+      )}
 
       {/* ── Attack Slots (up to 2) ── */}
       <div className="card-attacks">
@@ -236,6 +259,15 @@ export default function CreatureCard({
           <span className="stat-label">SPD</span>
           <span className="stat-value">{spd}</span>
         </div>
+        {level > 1 && (
+          <>
+            <div className="card-stat-divider" />
+            <div className="card-stat card-stat--level">
+              <span className="stat-level-stars">{'⭐'.repeat(Math.min(5, level - 1))}</span>
+              <span className="stat-label stat-label--level">Lv {level}</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Level / XP Bar ── */}

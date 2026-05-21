@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CreatureCard from '../components/CreatureCard';
 import StoryLetter from '../components/StoryLetter';
@@ -11,18 +11,61 @@ import AudioManager from '../audio/AudioManager';
 import './CroganBattle.css';
 import './Arena.css';
 
-// ── Crogan's fixed team ──────────────────────────────────────────────────────
-const CROGAN_TEAM = [
-  { id: 'c1', name: 'Slag',     type: 'iron',  hp: 170, atk: 70, def: 65, spd: 25,
-    attacks: [{ name: 'Iron Bash',   damage: 40, type: 'iron'  },
-              { name: 'Slag Hammer', damage: 55, type: 'iron'  }] },
-  { id: 'c2', name: 'Char',     type: 'ember', hp: 140, atk: 80, def: 40, spd: 50,
-    attacks: [{ name: 'Fire Snarl',  damage: 35, type: 'ember' },
-              { name: 'Blaze Crush', damage: 50, type: 'ember' }] },
-  { id: 'c3', name: 'Rustfang', type: 'iron',  hp: 160, atk: 65, def: 70, spd: 30,
-    attacks: [{ name: 'Metal Bite',  damage: 38, type: 'iron'  },
-              { name: 'Forge Slam',  damage: 52, type: 'iron'  }] },
+// ── Crogan's team — scales to the player's average power ────────────────────
+const CROGAN_TEMPLATES = [
+  { id: 'c1', name: 'Slag',     type: 'iron',
+    hp: 170, atk: 70, def: 65, spd: 25,
+    attacks: [{ name: 'Iron Bash',   baseDamage: 40, type: 'iron' },
+              { name: 'Slag Hammer', baseDamage: 55, type: 'iron' }] },
+  { id: 'c2', name: 'Char',     type: 'ember',
+    hp: 140, atk: 80, def: 40, spd: 50,
+    attacks: [{ name: 'Fire Snarl',  baseDamage: 35, type: 'ember' },
+              { name: 'Blaze Crush', baseDamage: 50, type: 'ember' }] },
+  { id: 'c3', name: 'Rustfang', type: 'iron',
+    hp: 160, atk: 65, def: 70, spd: 30,
+    attacks: [{ name: 'Metal Bite', baseDamage: 38, type: 'iron' },
+              { name: 'Forge Slam', baseDamage: 52, type: 'iron' }] },
 ];
+
+function buildCroganTeam(playerCollection) {
+  // Fallback to base stats when the player has no creatures
+  if (!playerCollection.length) {
+    return CROGAN_TEMPLATES.map(t => ({
+      ...t,
+      attacks: t.attacks.map(a => ({ name: a.name, type: a.type, damage: a.baseDamage })),
+    }));
+  }
+
+  // Average total stats (hp+atk+def+spd) across the player's whole collection
+  const playerPower = playerCollection.reduce(
+    (sum, c) => sum + (c.hp || 0) + (c.atk || 0) + (c.def || 0) + (c.spd || 0), 0
+  ) / playerCollection.length;
+
+  return CROGAN_TEMPLATES.map(template => {
+    const basePower   = template.hp + template.atk + template.def + template.spd;
+    const scaleFactor = (playerPower * 1.1) / basePower;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[CroganBattle] ${template.name}: basePower=${basePower}, playerPower=${Math.round(playerPower)}, scaleFactor=${scaleFactor.toFixed(3)}`);
+    }
+
+    const clamp = (v, lo, hi) => Math.round(Math.max(lo, Math.min(hi, v)));
+    const scaledAtk = clamp(template.atk * scaleFactor, 30, 130);
+
+    return {
+      ...template,
+      hp:  clamp(template.hp  * scaleFactor, 120, 350),
+      atk: scaledAtk,
+      def: clamp(template.def * scaleFactor, 30, 130),
+      spd: clamp(template.spd * scaleFactor, 30, 130),
+      attacks: template.attacks.map(a => ({
+        name:   a.name,
+        type:   a.type,
+        damage: clamp(a.baseDamage * (scaledAtk / template.atk), 15, 100),
+      })),
+    };
+  });
+}
 
 // ── Type chart + damage ──────────────────────────────────────────────────────
 function getMultiplier(attackType, defenderType, defenderDualType = null) {
@@ -104,6 +147,9 @@ export default function CroganBattle() {
     () => JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]')
   );
 
+  // Crogan's team scales to the player's collection power (memoised — collection never changes)
+  const croganTeam = useMemo(() => buildCroganTeam(collection), [collection]);
+
   // Phases: intro → selecting → battling → switching → victory | defeat
   const [phase,        setPhase]        = useState('intro');
   const [victoryStep,  setVictoryStep]  = useState(0);
@@ -127,11 +173,11 @@ export default function CroganBattle() {
   const genesisRef = useRef({
     id: 'genesis-' + Date.now(),
     name: 'Genesis', type: 'storm', dualType: 'ember',
-    hp: 170, currentHp: 170, atk: 80, def: 65, spd: 70,
-    level: 5, xp: 0, isLegendary: true,
+    hp: 210, currentHp: 210, atk: 105, def: 85, spd: 95,
+    level: 7, xp: 0, isLegendary: true,
     attacks: [
-      { name: 'Stormflare',  damage: 45, type: 'storm' },
-      { name: 'Ember Surge', damage: 42, type: 'ember' },
+      { name: 'Stormflare',  damage: 60, type: 'storm' },
+      { name: 'Ember Surge', damage: 55, type: 'ember' },
     ],
     image: LEGENDARY_ART_PATHS.genesis, imagePosition: { x: 50, y: 50 },
   });
@@ -139,11 +185,11 @@ export default function CroganBattle() {
   const rekronRef = useRef({
     id: 'rekron-' + Date.now(),
     name: 'Rekron', type: 'ember', dualType: 'iron',
-    hp: 165, currentHp: 165, atk: 85, def: 75, spd: 50,
-    level: 5, xp: 0, isLegendary: true,
+    hp: 200, currentHp: 200, atk: 110, def: 100, spd: 70,
+    level: 7, xp: 0, isLegendary: true,
     attacks: [
-      { name: 'Forge Fire', damage: 48, type: 'ember' },
-      { name: 'Iron Blaze', damage: 40, type: 'iron'  },
+      { name: 'Forge Fire', damage: 65, type: 'ember' },
+      { name: 'Iron Blaze', damage: 52, type: 'iron'  },
     ],
     image: LEGENDARY_ART_PATHS.rekron, imagePosition: { x: 50, y: 50 },
   });
@@ -174,7 +220,7 @@ export default function CroganBattle() {
       return { ...c, currentHp: c.hp };
     });
 
-    const et = CROGAN_TEAM.map(c => {
+    const et = croganTeam.map(c => {
       const img = getRandomImage();
       return { ...c, currentHp: c.hp, image: isReservedArt(img) ? getRandomImage() : img };
     });
@@ -214,7 +260,17 @@ export default function CroganBattle() {
     const dmg  = calcDamage(attacker, attack, defender);
     AudioManager.playHit(attack.type, dmg, defender.hp);
     const mult = getMultiplier(attack.type, defender.type, defender.dualType);
-    const tag  = mult > 1 ? ' ✨ Super effective!' : mult < 1 ? ' 😬 Not very effective…' : '';
+    const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
+    let tag = '';
+    if (mult > 1) {
+      tag = attack.type?.toLowerCase() === 'phantom'
+        ? ' ✨ Phantom strikes all types harder!'
+        : ` ✨ ${cap(attack.type)} is strong against ${cap(defender.type)}!`;
+    } else if (mult < 1) {
+      tag = defender.type?.toLowerCase() === 'phantom'
+        ? ' 😬 Phantom absorbs some of that damage.'
+        : ` 😬 ${cap(defender.type)} resists that attack.`;
+    }
     addLog(
       `${attacker.name} used ${attack.name}! Dealt ${dmg} damage.${tag}`,
       isPlayer ? 'player' : 'enemy'
@@ -428,7 +484,7 @@ export default function CroganBattle() {
               <div className="crogan-enemy-preview">
                 <p className="crogan-enemy-preview-label">Crogan's team:</p>
                 <div className="crogan-enemy-chips">
-                  {CROGAN_TEAM.map(c => (
+                  {croganTeam.map(c => (
                     <div key={c.id} className="crogan-enemy-chip">
                       <span className="crogan-enemy-chip-name">{c.name}</span>
                       <span className={`crogan-enemy-chip-type crogan-chip-type--${c.type}`}>{c.type}</span>
@@ -643,8 +699,8 @@ export default function CroganBattle() {
         subtitle="Dual Type: Storm · Ember"
         paragraphs={[
           "A creature born of lightning and flame — the sky's fury given form.",
-          "HP: 170 · ATK: 80 · DEF: 65 · SPD: 70",
-          "Attacks: Stormflare (Storm, 45 dmg) · Ember Surge (Ember, 42 dmg)",
+          "HP: 210 · ATK: 105 · DEF: 85 · SPD: 95",
+          "Attacks: Stormflare (Storm, 60 dmg) · Ember Surge (Ember, 55 dmg)",
           "\"Genesis was the first dual-type creature your uncle ever created. Two elements in perfect balance — the strengths of both, the weaknesses of neither.\" — Mira",
         ]}
         buttonText="Continue →"
@@ -660,8 +716,8 @@ export default function CroganBattle() {
         subtitle="Dual Type: Ember · Iron"
         paragraphs={[
           "A creature forged in fire and tempered in iron — relentless, unyielding, unstoppable.",
-          "HP: 165 · ATK: 85 · DEF: 75 · SPD: 50",
-          "Attacks: Forge Fire (Ember, 48 dmg) · Iron Blaze (Iron, 40 dmg)",
+          "HP: 200 · ATK: 110 · DEF: 100 · SPD: 70",
+          "Attacks: Forge Fire (Ember, 65 dmg) · Iron Blaze (Iron, 52 dmg)",
           "\"Rekron was the second. Your uncle said some forces were never meant to be separated. Fire and iron — destruction and endurance, forged as one.\" — Mira",
         ]}
         buttonText="Welcome them both →"
