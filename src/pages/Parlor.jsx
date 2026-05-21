@@ -637,7 +637,7 @@ const ALL_DEV_FLAGS = [
   'mira-bully-quest-started',
   'mira-bully-quest-complete',
   'genesis-received',
-  'rekkon-received',
+  'rekron-received',
   'old-wren-appeared',
   'old-wren-page-delivered',
   'study-page-hidden',
@@ -853,7 +853,7 @@ function DevConsole({ onClose }) {
             </button>
 
             <button className="dev-btn dev-btn--scenario" onClick={() => {
-              localStorage.setItem(profileKey('tutorial-complete'), '');
+              setStoryFlag('tutorial-complete', false);
               showDevToast('Tutorial reset — visit Manor Map to replay.');
             }}>
               📖 Reset Tutorial

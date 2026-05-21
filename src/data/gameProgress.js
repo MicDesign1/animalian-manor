@@ -14,12 +14,13 @@ import { getRandomImage } from './creatureImages';
 // Every flag starts false. Add new flags here as the story grows.
 
 const DEFAULT_FLAGS = {
+  'tutorial-complete':         false,
   'lawyer-letter-delivered':   false,
   'mira-bully-quest-available': false,
   'mira-bully-quest-started':  false,
   'mira-bully-quest-complete': false,
   'genesis-received':          false,
-  'rekkon-received':           false,
+  'rekron-received':           false,
   'old-wren-appeared':         false,
   'old-wren-page-delivered':   false,
   'study-page-hidden':         false, // page 3 is findable inside the Study
@@ -156,6 +157,16 @@ export function checkMilestones() {
   return ready;
 }
 
+// Returns true if the tutorial has been completed for the active profile.
+export function isTutorialComplete() {
+  return readFlags()['tutorial-complete'] === true;
+}
+
+// Marks the tutorial as complete for the active profile.
+export function setTutorialComplete() {
+  setStoryFlag('tutorial-complete', true);
+}
+
 // Hard-resets all story progress for the active profile back to defaults.
 // Creatures and coins are left untouched.
 // Requires the string 'CONFIRM' as a safety guard against accidental calls.
@@ -201,7 +212,7 @@ export function migrateLegendaryCreatureArt() {
         // Properly story-gifted legendaries: keep them.
         if (c.isLegendary) return c;
         if (c.name === 'Genesis' && flags['genesis-received']) return c;
-        if (c.name === 'Rekron'  && flags['rekkon-received'])  return c;
+        if (c.name === 'Rekron'  && flags['rekron-received'])  return c;
         // Any other creature that somehow got reserved art — reassign.
         const replacement = getRandomImage();
         const profileLabel = prefix ? prefix.slice(0, -1) : '(legacy)';

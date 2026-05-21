@@ -417,8 +417,8 @@ export default function Arena() {
         }
       }
 
-      // Field training always fires after a win — one creature, +5 points
-      setFieldParticipants(updatedCreatures.filter(c => participatedIds.has(c.id)));
+      // Field training always fires after a win — one creature, +5 points (legendaries excluded)
+      setFieldParticipants(updatedCreatures.filter(c => participatedIds.has(c.id) && !c.isLegendary));
 
       AudioManager.playSfx('/sounds/crowd-cheer.mp3');
     } else {

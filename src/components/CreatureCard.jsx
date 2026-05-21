@@ -89,7 +89,7 @@ export default function CreatureCard({
     xp    = 0,
   } = creature;
 
-  const xpToNext = level * 50;
+  const xpToNext = level * 3;
   const xpPct    = Math.min(100, Math.round((xp / xpToNext) * 100));
 
   const t  = TYPE_DATA[type]     || TYPE_DATA.iron;
@@ -244,6 +244,7 @@ export default function CreatureCard({
       </div>
 
       {/* ── Stats Bar: ATK / DEF / SPD ── */}
+      {/* Legendary creatures intentionally exceed standard stat caps (HP 200, ATK/DEF/SPD 100) — this is by design. */}
       <div className="card-stats-bar">
         <div className="card-stat">
           <span className="stat-label">ATK</span>

@@ -2,7 +2,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getActiveProfile, clearActiveProfile, PORTRAITS, profileKey } from '../data/profiles';
 import StoryLetter from '../components/StoryLetter';
-import { getBattlesWon, checkMilestones, getStoryFlag, setStoryFlag, setJournalPages } from '../data/gameProgress';
+import { getBattlesWon, checkMilestones, getStoryFlag, setStoryFlag, setJournalPages, isTutorialComplete, setTutorialComplete } from '../data/gameProgress';
 import AudioManager from '../audio/AudioManager';
 import './ManorMap.css';
 
@@ -270,7 +270,7 @@ export default function ManorMap() {
 
   // Start tutorial only if not already complete AND no creatures (handles migrated profiles)
   const [tutorialStep, setTutorialStep] = useState(() => {
-    const done = localStorage.getItem(profileKey('tutorial-complete')) === 'true';
+    const done = isTutorialComplete();
     const hasCreatures = (() => {
       try { return JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]').length > 0; }
       catch { return false; }
@@ -303,7 +303,7 @@ export default function ManorMap() {
   }
 
   function completeTutorial() {
-    localStorage.setItem(profileKey('tutorial-complete'), 'true');
+    setTutorialComplete();
     setTutorialStep(null);
   }
 
