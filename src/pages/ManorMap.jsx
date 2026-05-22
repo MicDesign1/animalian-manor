@@ -21,6 +21,9 @@ const JOURNAL_PAGE_2 = {
 };
 
 // ── Room data ─────────────────────────────────────────────────────────────────
+// top / left / width / height are percentages RELATIVE TO THE IMAGE itself,
+// not the container. The imgBounds calculation converts them to pixel positions
+// that account for object-fit:contain letterboxing on any screen size.
 
 const ROOMS = [
   {
@@ -112,6 +115,40 @@ const TUTORIAL_STEPS = [
 
 const MANOR_EVENTS = new Set(['lawyer-letter', 'ransack-event', 'final-letter']);
 
+// ── Image-bounds helper ───────────────────────────────────────────────────────
+// Given the container size and the image's natural size, returns the pixel
+// rect of the rendered image within the container (object-fit:contain).
+
+function calcImgBounds(containerW, containerH, natW, natH) {
+  const imgAspect       = natW / natH;
+  const containerAspect = containerW / containerH;
+  let renderedW, renderedH, offsetX, offsetY;
+  if (imgAspect > containerAspect) {
+    // Image is wider relative to its height → constrained by container width
+    renderedW = containerW;
+    renderedH = containerW / imgAspect;
+    offsetX   = 0;
+    offsetY   = (containerH - renderedH) / 2;
+  } else {
+    // Image is taller relative to its width → constrained by container height
+    renderedH = containerH;
+    renderedW = containerH * imgAspect;
+    offsetX   = (containerW - renderedW) / 2;
+    offsetY   = 0;
+  }
+  return { offsetX, offsetY, renderedW, renderedH };
+}
+
+// Convert image-relative % values for one room into pixel style coords.
+function roomToPixels(room, bounds) {
+  return {
+    top:    `${bounds.offsetY + (parseFloat(room.top)    / 100) * bounds.renderedH}px`,
+    left:   `${bounds.offsetX + (parseFloat(room.left)   / 100) * bounds.renderedW}px`,
+    width:  `${(parseFloat(room.width)  / 100) * bounds.renderedW}px`,
+    height: `${(parseFloat(room.height) / 100) * bounds.renderedH}px`,
+  };
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function ManorMap() {
@@ -140,6 +177,43 @@ export default function ManorMap() {
     AudioManager.playMusic('/sounds/main-screen.mp3');
     return () => AudioManager.stopMusic();
   }, []);
+
+  // ── Image-bounds tracking ─────────────────────────────────────────────────
+  // Measures where manor.png actually renders inside the container after
+  // object-fit:contain is applied.  Re-runs whenever the window resizes so
+  // hotspot positions stay locked to the image on orientation change, etc.
+
+  const imageRef   = useRef(null);
+  const [imgBounds, setImgBounds] = useState(null);
+
+  useLayoutEffect(() => {
+    function measure() {
+      const img       = imageRef.current;
+      const container = mapContainerRef.current;
+      if (!img || !container || !img.naturalWidth || !img.naturalHeight) return;
+      const bounds = calcImgBounds(
+        container.clientWidth,
+        container.clientHeight,
+        img.naturalWidth,
+        img.naturalHeight,
+      );
+      setImgBounds(bounds);
+    }
+
+    const img = imageRef.current;
+    if (img) {
+      if (img.complete && img.naturalWidth) {
+        measure();
+      } else {
+        img.addEventListener('load', measure);
+      }
+    }
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      img?.removeEventListener('load', measure);
+    };
+  }, []); // eslint-disable-line
 
   // When edit mode activates, seed editPositions from the actual DOM positions so
   // dragging starts from exactly where CSS placed each hotspot.
@@ -308,8 +382,7 @@ export default function ManorMap() {
   }
 
   // Return the fixed-position bounding rect for a room's hotspot element.
-  // Reads from the live DOM element when available (accurate regardless of breakpoint),
-  // with a fallback to the ROOMS array values for the tutorial before elements mount.
+  // Reads from the live DOM element — accurate once imgBounds has positioned hotspots.
   function getSpotlightRect(roomId) {
     if (!roomId) return null;
     const el = hotspotRefs.current[roomId];
@@ -317,9 +390,20 @@ export default function ManorMap() {
       const r = el.getBoundingClientRect();
       return { top: r.top, left: r.left, width: r.width, height: r.height };
     }
+    // Fallback: estimate from container + imgBounds (used only before elements mount)
     if (!containerRect) return null;
     const room = ROOMS.find(r => r.id === roomId);
     if (!room) return null;
+    if (imgBounds) {
+      const cRect = mapContainerRef.current?.getBoundingClientRect();
+      if (!cRect) return null;
+      return {
+        top:    cRect.top  + imgBounds.offsetY + (parseFloat(room.top)    / 100) * imgBounds.renderedH,
+        left:   cRect.left + imgBounds.offsetX + (parseFloat(room.left)   / 100) * imgBounds.renderedW,
+        width:  (parseFloat(room.width)  / 100) * imgBounds.renderedW,
+        height: (parseFloat(room.height) / 100) * imgBounds.renderedH,
+      };
+    }
     return {
       top:    containerRect.top    + (parseFloat(room.top)    / 100) * containerRect.height,
       left:   containerRect.left   + (parseFloat(room.left)   / 100) * containerRect.width,
@@ -340,13 +424,13 @@ export default function ManorMap() {
     if (!tutSpotRect) return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     const VH = window.innerHeight;
     const VW = window.innerWidth;
-    const TOOLTIP_W = 300;
+    const TOOLTIP_W = Math.min(300, VW - 24);
     const isUpperHalf = (tutSpotRect.top + tutSpotRect.height / 2) < VH * 0.55;
     const clampedLeft = Math.max(12, Math.min(VW - TOOLTIP_W - 12,
       tutSpotRect.left + tutSpotRect.width / 2 - TOOLTIP_W / 2));
     return isUpperHalf
-      ? { top:    tutSpotRect.top + tutSpotRect.height + 14, left: clampedLeft }
-      : { bottom: VH - tutSpotRect.top + 14,                left: clampedLeft };
+      ? { top:    tutSpotRect.top + tutSpotRect.height + 14, left: clampedLeft, width: TOOLTIP_W }
+      : { bottom: VH - tutSpotRect.top + 14,                left: clampedLeft, width: TOOLTIP_W };
   })();
 
   // ── Room navigation ───────────────────────────────────────────────────────
@@ -434,6 +518,7 @@ export default function ManorMap() {
         ref={mapContainerRef}
       >
         <img
+          ref={imageRef}
           src="/manor.png"
           alt="Animalian Manor Floor Plan"
           className="manor-map-image"
@@ -443,6 +528,15 @@ export default function ManorMap() {
         {/* Standard Room Hotspots */}
         {ROOMS.map((room) => {
           const pos = editPositions[room.id];
+          // Edit mode uses container-% positions from dragging state.
+          // Normal mode uses pixel positions calculated from the actual rendered
+          // image bounds — this keeps hotspots aligned on every screen size.
+          const hotspotStyle = (isEditMode && editReady)
+            ? { top: pos.top, left: pos.left, width: pos.width, height: pos.height }
+            : imgBounds
+            ? roomToPixels(room, imgBounds)
+            : undefined; // CSS class fallback until image loads (sub-frame)
+
           return (
             <button
               key={room.id}
@@ -454,7 +548,7 @@ export default function ManorMap() {
                 !isEditMode && hoveredRoom === room.id  ? 'hovered'             : '',
                 !isEditMode && clickedRoom === room.id  ? 'clicked'             : '',
               ].join(' ').trim()}
-              style={(isEditMode && editReady) ? { top: pos.top, left: pos.left, width: pos.width, height: pos.height } : undefined}
+              style={hotspotStyle}
               onMouseEnter={() => { if (!isEditMode) setHoveredRoom(room.id); }}
               onMouseLeave={() => { if (!isEditMode) setHoveredRoom(null); }}
               onClick={isEditMode ? (e) => { e.preventDefault(); e.stopPropagation(); } : () => handleRoomClick(room)}
@@ -486,6 +580,12 @@ export default function ManorMap() {
         {/* Trapdoor Hotspot — appears after the ransack event */}
         {trapdoorVisible && (() => {
           const pos = editPositions[TRAPDOOR_ROOM.id];
+          const hotspotStyle = (isEditMode && editReady)
+            ? { top: pos.top, left: pos.left, width: pos.width, height: pos.height }
+            : imgBounds
+            ? roomToPixels(TRAPDOOR_ROOM, imgBounds)
+            : undefined;
+
           return (
             <button
               ref={el => { hotspotRefs.current[TRAPDOOR_ROOM.id] = el; }}
@@ -495,7 +595,7 @@ export default function ManorMap() {
                 !isEditMode && hoveredRoom === TRAPDOOR_ROOM.id ? 'hovered'             : '',
                 !isEditMode && clickedRoom === TRAPDOOR_ROOM.id ? 'clicked'             : '',
               ].join(' ').trim()}
-              style={(isEditMode && editReady) ? { top: pos.top, left: pos.left, width: pos.width, height: pos.height } : undefined}
+              style={hotspotStyle}
               onMouseEnter={() => { if (!isEditMode) setHoveredRoom(TRAPDOOR_ROOM.id); }}
               onMouseLeave={() => { if (!isEditMode) setHoveredRoom(null); }}
               onClick={isEditMode ? (e) => { e.preventDefault(); e.stopPropagation(); } : () => handleRoomClick(TRAPDOOR_ROOM)}

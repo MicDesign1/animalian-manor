@@ -26,24 +26,11 @@ import './styles/globals.css';
 export default function App() {
   return (
     <BrowserRouter basename="/game">
-      <div style={{
-        width: "100vw",
-        height: "100vh",
-        margin: 0,
-        padding: 0,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--dark-oak)",
-        position: "relative"
-      }}>
-        
-        {/* Game content area */}
-        <div style={{
-          flex: 1,
-          position: "relative",
-          overflow: "hidden"
-        }}>
+      {/* app-shell: fills the visual viewport (100dvh) and holds content + fixed HUD */}
+      <div className="app-shell">
+
+        {/* app-content: flex-fills remaining height above the fixed BottomBar */}
+        <div className="app-content">
           <Routes>
             {/* ── Pre-game / profile flow ── */}
             <Route path="/"               element={<Launcher />} />
@@ -72,7 +59,7 @@ export default function App() {
           </Routes>
         </div>
 
-        {/* Persistent HUD */}
+        {/* Persistent HUD — position:fixed, doesn't affect flex flow */}
         <BottomBar />
       </div>
     </BrowserRouter>

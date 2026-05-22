@@ -3,22 +3,7 @@
    Victorian Naturalist Aesthetic
    ═══════════════════════════════════════════ */
 
-
-/* Mobile-first full-screen fixes */
-html, body, #root {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-/* Prevent scrolling on the whole page */
-body {
-  touch-action: manipulation;
-}
-
-   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 @import './games.css';
 
 :root {
@@ -45,7 +30,7 @@ body {
   --font-body: 'Crimson Text', Georgia, serif;
   --font-ui: system-ui, -apple-system, sans-serif;
 
-  /* ── Bottom HUD bar height — includes home-indicator safe area on notched phones ── */
+  /* ── Bottom HUD bar height (single row + iOS home-indicator safe area) ── */
   --bottom-bar-height: calc(58px + env(safe-area-inset-bottom, 0px));
 
   /* ── Spacing ── */
@@ -54,6 +39,14 @@ body {
   --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
+}
+
+/* On mobile the bar stacks into 2 rows — update the height variable so all
+   screens that subtract --bottom-bar-height stay in sync automatically. */
+@media (max-width: 768px) {
+  :root {
+    --bottom-bar-height: calc(106px + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 *, *::before, *::after {
@@ -66,17 +59,14 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
-/* #root scrolls when a page needs it (e.g. multi-card grid views).
-   Pages that must not scroll (ManorMap) use height:100vh + overflow:hidden on their root element. */
+/* #root fills its parent; the app-shell inside it drives the real layout. */
 #root {
   width: 100%;
   height: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch; /* smooth momentum scroll on iOS */
 }
-
 
 body {
   font-family: var(--font-body);
@@ -84,6 +74,34 @@ body {
   color: var(--cream);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── App shell ─────────────────────────────────────────────────────────────
+   Outer wrapper — fills the true visual viewport height.
+   100dvh (dynamic viewport height) accounts for the iOS/Android address bar
+   so the game is never taller than what's actually on screen.
+   Browsers that don't understand dvh fall back to 100vh silently.
+   ───────────────────────────────────────────────────────────────────────── */
+.app-shell {
+  width: 100vw;
+  height: 100vh;   /* fallback for old browsers */
+  height: 100dvh;  /* true visual viewport — no address-bar overflow */
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--dark-oak);
+  position: relative;
+}
+
+/* Inner content area — fills all space above the fixed BottomBar.
+   min-height:0 is required so flex children can shrink below content size. */
+.app-content {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Prevent text selection on game UI */
