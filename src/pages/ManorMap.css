@@ -4,9 +4,10 @@
 
 .manor-map {
   width: 100%;
-  /* Fill the content area above the fixed BottomBar */
-  height: calc(100vh  - var(--bottom-bar-height));
-  height: calc(100dvh - var(--bottom-bar-height)); /* dvh = true visual viewport */
+  /* height:100% fills .app-content's content area.
+     .app-content has padding-bottom:var(--bottom-bar-height) so the map
+     ends exactly where the BottomBar begins — no subtraction needed here. */
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

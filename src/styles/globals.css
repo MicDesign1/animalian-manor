@@ -96,12 +96,15 @@ body {
 }
 
 /* Inner content area — fills all space above the fixed BottomBar.
-   min-height:0 is required so flex children can shrink below content size. */
+   min-height:0 is required so flex children can shrink below content size.
+   padding-bottom reserves exactly the bar's height so every page's content
+   sits above the bar without each page needing its own height calculation. */
 .app-content {
   flex: 1;
   min-height: 0;
   position: relative;
   overflow: hidden;
+  padding-bottom: var(--bottom-bar-height);
 }
 
 /* Prevent text selection on game UI */
