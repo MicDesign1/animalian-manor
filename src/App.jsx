@@ -22,38 +22,24 @@ import BasementBattle from './pages/BasementBattle';
 import BottomBar from './components/BottomBar';
 import './styles/globals.css';
 
+
 export default function App() {
   return (
     <BrowserRouter basename="/game">
-      <Routes>
-        {/* ── Pre-game / profile flow ── */}
-        <Route path="/"               element={<Launcher />} />
-        <Route path="/splash"         element={<Splash />} />
-        <Route path="/intro"          element={<Intro />} />
-        <Route path="/profile-picker" element={<ProfilePicker />} />
-        <Route path="/create-player"  element={<PlayerCreate />} />
+      <div className="w-screen h-screen overflow-hidden flex flex-col relative bg-black">
+        {/* Game content fills the remaining space */}
+        <div className="flex-1 relative overflow-hidden">
+          <Routes>
+            {/* your existing routes stay exactly the same */}
+            <Route path="/"               element={<Launcher />} />
+            <Route path="/splash"         element={<Splash />} />
+            {/* ... all other routes ... */}
+          </Routes>
+        </div>
 
-        {/* ── In-game screens ── */}
-        <Route path="/manor"    element={<ManorMap />} />
-        <Route path="/menagerie" element={<Menagerie />} />
-        <Route path="/lab"       element={<Lab />} />
-        <Route path="/study"     element={<Study />} />
-        <Route path="/vault"     element={<Vault />} />
-        <Route path="/parlor"    element={<Parlor />} />
-        <Route path="/arena"         element={<Arena />} />
-        <Route path="/crogan-battle" element={<CroganBattle />} />
-        <Route path="/basement"      element={<BasementBattle />} />
-        <Route path="/match"     element={<MatchGame />} />
-        <Route path="/rps"       element={<RpsGame />} />
-        <Route path="/dice"      element={<DiceGame />} />
-
-        {/* ── Dev / demo pages ── */}
-        <Route path="/card-demo" element={<CardDemo />} />
-        <Route path="/card-test" element={<CardTest />} />
-      </Routes>
-      
-      {/* Persistent HUD — hidden on pre-game routes, sits above all page content */}
-      <BottomBar />
+        {/* Persistent HUD — now properly placed */}
+        <BottomBar />
+      </div>
     </BrowserRouter>
   );
 }

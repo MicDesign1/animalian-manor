@@ -21,7 +21,7 @@ import { profileKey } from '../data/profiles';
 
 const BASE      = import.meta.env.BASE_URL;
 const POOL_SIZE = 4;
-const DEFAULTS  = { music: 0.5, sfx: 0.7 };
+const DEFAULTS  = { music: 0.25, sfx: 0.7 };
 
 // Crossfade between tracks: 10 steps × 20 ms = 200 ms total
 const FADE_STEPS    = 10;
