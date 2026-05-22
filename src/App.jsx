@@ -24,7 +24,8 @@ import './styles/globals.css';
 
 export default function App() {
   return (
-        <BrowserRouter basename="/game"> 
+    <BrowserRouter basename="/game">
+      <Routes>
         {/* ── Pre-game / profile flow ── */}
         <Route path="/"               element={<Launcher />} />
         <Route path="/splash"         element={<Splash />} />
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/card-demo" element={<CardDemo />} />
         <Route path="/card-test" element={<CardTest />} />
       </Routes>
+      
       {/* Persistent HUD — hidden on pre-game routes, sits above all page content */}
       <BottomBar />
     </BrowserRouter>
