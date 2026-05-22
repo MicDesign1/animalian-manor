@@ -93,7 +93,7 @@ function getMultiplier(attackType, defenderType, defenderDualType = null) {
 
 function calcDamage(attacker, attack, defender) {
   const base = Math.max(5, attack.damage + Math.floor((attacker.atk - defender.def) / 4));
-  return Math.round(base * getMultiplier(attack.type, defender.type, defender.dualType));
+  return Math.round(base * getMultiplier(attack.type ?? attacker.type, defender.type, defender.dualType));
 }
 
 function getStrongIdx(attacks) {
@@ -257,15 +257,16 @@ export default function CroganBattle() {
 
   // ── Log one hit; return defender's remaining HP ───────────────────────────
   function strikeLog(attacker, attack, defender, isPlayer) {
+    const atkType = attack.type ?? attacker.type;
     const dmg  = calcDamage(attacker, attack, defender);
-    AudioManager.playHit(attack.type, dmg, defender.hp);
-    const mult = getMultiplier(attack.type, defender.type, defender.dualType);
+    AudioManager.playHit(atkType, dmg, defender.hp);
+    const mult = getMultiplier(atkType, defender.type, defender.dualType);
     const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
     let tag = '';
     if (mult > 1) {
-      tag = attack.type?.toLowerCase() === 'phantom'
+      tag = atkType?.toLowerCase() === 'phantom'
         ? ' ✨ Phantom strikes all types harder!'
-        : ` ✨ ${cap(attack.type)} is strong against ${cap(defender.type)}!`;
+        : ` ✨ ${cap(atkType)} is strong against ${cap(defender.type)}!`;
     } else if (mult < 1) {
       tag = defender.type?.toLowerCase() === 'phantom'
         ? ' 😬 Phantom absorbs some of that damage.'

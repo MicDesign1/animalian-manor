@@ -98,8 +98,7 @@ export default function Lab() {
   const [type,    setType]    = useState('ember');
   const [attacks, setAttacks] = useState(() => {
     const [a1, a2] = generateAttackNames('ember');
-    // Each attack carries its own type so kids can mix and match elements
-    return [{ name: a1, damage: 20, type: 'ember' }, { name: a2, damage: 20, type: 'ember' }];
+    return [{ name: a1, damage: 20 }, { name: a2, damage: 20 }];
   });
 
   // Regenerate creature + attack names whenever the creature type is switched.
@@ -110,8 +109,8 @@ export default function Lab() {
     setName(generateCreatureName(type));
     const [a1, a2] = generateAttackNames(type);
     setAttacks(prev => [
-      { ...prev[0], name: a1, type },
-      { ...prev[1], name: a2, type },
+      { ...prev[0], name: a1 },
+      { ...prev[1], name: a2 },
     ]);
   }, [type]);
 
@@ -184,7 +183,7 @@ export default function Lab() {
   function resetForm() {
     setName(generateCreatureName(type));
     const [a1, a2] = generateAttackNames(type);
-    setAttacks([{ name: a1, damage: 20, type }, { name: a2, damage: 20, type }]);
+    setAttacks([{ name: a1, damage: 20 }, { name: a2, damage: 20 }]);
     setImage(getRandomImage());
     setPosition({ x: 50, y: 50 });
     setImageColor(null);
@@ -389,7 +388,7 @@ export default function Lab() {
       imagePosition:      position,
       imageColor:         imageColor,
       imageColorStrength: colorStrength,
-      attacks:       attacks.map(a => ({ name: a.name, damage: a.damage, type: a.type || type })),
+      attacks:       attacks.map(a => ({ name: a.name, damage: a.damage })),
       atk,
       def,
       spd,
@@ -609,20 +608,14 @@ export default function Lab() {
                         />
                         <span className="attack-dmg-value">{attackEntry.damage}</span>
                       </div>
-                      {/* Attack type picker */}
-                      <div className="attack-type-row">
-                        {TYPES.map(t => (
-                          <button
-                            key={t.id}
-                            type="button"
-                            className={`attack-type-btn${attackEntry.type === t.id ? ' selected' : ''}`}
-                            style={{ '--t-color': t.color }}
-                            onClick={() => updateAttack(i, 'type', t.id)}
-                            title={t.label}
-                          >
-                            {t.icon}
-                          </button>
-                        ))}
+                      {/* Attack type — locked to creature type */}
+                      <div className="attack-type-display" style={{ '--t-color': typeColor }}>
+                        <span className="attack-type-display-icon">
+                          {TYPES.find(t => t.id === type)?.icon}
+                        </span>
+                        <span className="attack-type-display-label">
+                          {TYPES.find(t => t.id === type)?.label}
+                        </span>
                       </div>
                     </div>
                   );

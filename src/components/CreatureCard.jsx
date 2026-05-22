@@ -231,16 +231,13 @@ export default function CreatureCard({
 
       {/* ── Attack Slots (up to 2) ── */}
       <div className="card-attacks">
-        {attacks.slice(0, 2).map((attack, i) => {
-          const atkType = TYPE_DATA[attack.type] || t;
-          return (
-            <div key={i} className="card-attack-row" style={{ borderLeftColor: atkType.color }}>
-              <span className="attack-icon">{atkType.icon}</span>
-              <span className="attack-name">{attack.name}</span>
-              <span className="attack-damage">{attack.damage}</span>
-            </div>
-          );
-        })}
+        {attacks.slice(0, 2).map((attack, i) => (
+          <div key={i} className="card-attack-row" style={{ borderLeftColor: t.color }}>
+            <span className="attack-icon">{t.icon}</span>
+            <span className="attack-name">{attack.name}</span>
+            <span className="attack-damage">{attack.damage}</span>
+          </div>
+        ))}
       </div>
 
       {/* ── Stats Bar: ATK / DEF / SPD ── */}

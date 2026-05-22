@@ -640,40 +640,24 @@
 }
 
 
-/* Bottom line: per-attack type picker */
-.attack-type-row {
-  display: flex;
-  gap: 5px;
-  padding-left: 17px;   /* aligns under the name input, past the row number */
-}
-
-/* Small emoji type buttons — one per element */
-.attack-type-btn {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 2px solid var(--t-color);
-  background: transparent;
-  font-size: 0.72rem;
-  line-height: 1;
-  cursor: pointer;
+/* Static type indicator beneath each attack slot */
+.attack-type-display {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0;
-  opacity: 0.4;
-  transition: opacity 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  gap: 5px;
+  padding-left: 17px;
 }
 
-.attack-type-btn:hover {
+.attack-type-display-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.attack-type-display-label {
+  font-size: 0.72rem;
+  color: var(--t-color);
+  font-style: italic;
   opacity: 0.8;
-  transform: scale(1.12);
-}
-
-.attack-type-btn.selected {
-  background: var(--t-color);
-  opacity: 1;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 }
 
 
