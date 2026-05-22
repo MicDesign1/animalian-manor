@@ -101,10 +101,11 @@ body {
    sits above the bar without each page needing its own height calculation. */
 .app-content {
   flex: 1;
-  min-height: 0;
+  min-height: 0;                    /* important for flex scrolling */
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;                 /* ← this was the missing piece */
   padding-bottom: var(--bottom-bar-height);
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
 }
 
 /* Prevent text selection on game UI */
