@@ -24,8 +24,7 @@ import './styles/globals.css';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+        <BrowserRouter basename="/game"> 
         {/* ── Pre-game / profile flow ── */}
         <Route path="/"               element={<Launcher />} />
         <Route path="/splash"         element={<Splash />} />
