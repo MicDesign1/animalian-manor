@@ -30,7 +30,7 @@ const ROOMS = [
     id: 'menagerie',
     name: 'The Menagerie Garden',
     description: 'Browse your creature collection',
-    top: '19.6%', left: '2.7%', width: '94%', height: '18.5%',
+    top: '28.9%', left: '2.7%', width: '94%', height: '18.5%',
     path: '/menagerie',
     icon: '🌿',
   },
