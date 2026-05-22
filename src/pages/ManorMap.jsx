@@ -352,6 +352,9 @@ export default function ManorMap() {
     return (done || hasCreatures) ? null : 0;
   });
 
+  // Measured post-commit spotlight rect — updated by useLayoutEffect below
+  const [tutSpotRect, setTutSpotRect] = useState(null);
+
   // Measure the map container once (+ on resize) so we can compute spotlight positions
   const mapContainerRef = useRef(null);
   const [containerRect, setContainerRect] = useState(null);
@@ -380,6 +383,14 @@ export default function ManorMap() {
     setTutorialComplete();
     setTutorialStep(null);
   }
+
+  // Measure the spotlight rect AFTER the DOM commits imgBounds pixel positions.
+  // useLayoutEffect runs post-commit, so getBoundingClientRect() returns accurate values.
+  useLayoutEffect(() => {
+    const tutActive = tutorialStep !== null;
+    const roomId    = tutActive ? TUTORIAL_STEPS[tutorialStep]?.roomId : null;
+    setTutSpotRect(roomId ? getSpotlightRect(roomId) : null);
+  }, [imgBounds, tutorialStep]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Return the fixed-position bounding rect for a room's hotspot element.
   // Reads from the live DOM element — accurate once imgBounds has positioned hotspots.
@@ -413,10 +424,9 @@ export default function ManorMap() {
   }
 
   // Pre-compute tutorial overlay data so the JSX stays readable
-  const tutActive    = tutorialStep !== null;
-  const tutStepData  = tutActive ? TUTORIAL_STEPS[tutorialStep] : null;
-  const tutSpotRect  = tutActive ? getSpotlightRect(tutStepData?.roomId) : null;
-  const tutIsLast    = tutorialStep === TUTORIAL_STEPS.length - 1;
+  const tutActive   = tutorialStep !== null;
+  const tutStepData = tutActive ? TUTORIAL_STEPS[tutorialStep] : null;
+  const tutIsLast   = tutorialStep === TUTORIAL_STEPS.length - 1;
 
   const tutTooltipPos = (() => {
     if (!tutActive) return null;

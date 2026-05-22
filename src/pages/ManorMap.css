@@ -611,11 +611,38 @@
 /* ── Mobile tweaks ── */
 
 @media (max-width: 768px) {
+
+  /* Switch from centered-title + absolute-badge to a proper flex space-between row.
+     The badge was position:absolute on desktop; here it joins the flex flow so
+     the title can shrink to the available width without overlapping. */
   .manor-title {
-    padding: 8px 16px;
+    padding: 8px 14px;
+    justify-content: space-between;
+    gap: 8px;
   }
 
-  /* Compact the title + profile badge so the map gets maximum screen space */
+  /* Title group can shrink; let the badge stay its natural size on the right */
+  .manor-title-center {
+    flex-shrink: 1;
+    min-width: 0;
+    gap: 8px;
+  }
+
+  /* Smaller type on mobile; clamp prevents it going below 1rem or above 1.5rem */
+  .manor-title h1 {
+    font-size: clamp(1rem, 4.5vw, 1.5rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Badge is no longer absolute — it participates in the flex row */
+  .manor-profile-badge {
+    position: static;
+    flex-shrink: 0;
+  }
+
+  /* Compact the profile name slightly */
   .manor-profile-name {
     font-size: 0.65rem;
   }
@@ -638,5 +665,45 @@
     width: auto;
     min-width: 260px;
     max-width: calc(100vw - 24px);
+  }
+}
+
+
+/* ── Narrow phones (≤480px): drop ornaments, tighten further ── */
+
+@media (max-width: 480px) {
+  .manor-title {
+    padding: 7px 12px;
+    gap: 6px;
+  }
+
+  /* Ornaments take ~40px combined — hiding them gives the title more room */
+  .manor-title-ornament {
+    display: none;
+  }
+
+  .manor-title h1 {
+    font-size: clamp(0.95rem, 4.5vw, 1.3rem);
+  }
+
+  /* Slightly smaller avatar */
+  .manor-profile-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+}
+
+
+/* ── Very narrow phones (≤360px): avatar only, no text in the badge ── */
+
+@media (max-width: 360px) {
+  .manor-title {
+    padding: 6px 10px;
+  }
+
+  /* Hide name + switch button, keep just the avatar circle */
+  .manor-profile-info {
+    display: none;
   }
 }

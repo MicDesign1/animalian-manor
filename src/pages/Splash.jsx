@@ -16,7 +16,7 @@ export default function Splash() {
     <div className="splash-root">
       <div className="splash-content">
         <h1 className="splash-title">Animalian Manor</h1>
-        <p className="splash-subtitle">From the estate of Uncle Argon</p>
+        <p className="splash-subtitle">Enter and accept your Destiny</p>
 
         <div className="splash-illustration" aria-hidden="true">🗝️</div>
 
