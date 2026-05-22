@@ -26,18 +26,53 @@ import './styles/globals.css';
 export default function App() {
   return (
     <BrowserRouter basename="/game">
-      <div className="w-screen h-screen overflow-hidden flex flex-col relative bg-black">
-        {/* Game content fills the remaining space */}
-        <div className="flex-1 relative overflow-hidden">
+      <div style={{
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        padding: 0,
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        background: "var(--dark-oak)",
+        position: "relative"
+      }}>
+        
+        {/* Game content area */}
+        <div style={{
+          flex: 1,
+          position: "relative",
+          overflow: "hidden"
+        }}>
           <Routes>
-            {/* your existing routes stay exactly the same */}
+            {/* ── Pre-game / profile flow ── */}
             <Route path="/"               element={<Launcher />} />
             <Route path="/splash"         element={<Splash />} />
-            {/* ... all other routes ... */}
+            <Route path="/intro"          element={<Intro />} />
+            <Route path="/profile-picker" element={<ProfilePicker />} />
+            <Route path="/create-player"  element={<PlayerCreate />} />
+
+            {/* ── In-game screens ── */}
+            <Route path="/manor"         element={<ManorMap />} />
+            <Route path="/menagerie"     element={<Menagerie />} />
+            <Route path="/lab"           element={<Lab />} />
+            <Route path="/study"         element={<Study />} />
+            <Route path="/vault"         element={<Vault />} />
+            <Route path="/parlor"        element={<Parlor />} />
+            <Route path="/arena"         element={<Arena />} />
+            <Route path="/crogan-battle" element={<CroganBattle />} />
+            <Route path="/basement"      element={<BasementBattle />} />
+            <Route path="/match"         element={<MatchGame />} />
+            <Route path="/rps"           element={<RpsGame />} />
+            <Route path="/dice"          element={<DiceGame />} />
+
+            {/* ── Dev / demo pages ── */}
+            <Route path="/card-demo" element={<CardDemo />} />
+            <Route path="/card-test" element={<CardTest />} />
           </Routes>
         </div>
 
-        {/* Persistent HUD — now properly placed */}
+        {/* Persistent HUD */}
         <BottomBar />
       </div>
     </BrowserRouter>

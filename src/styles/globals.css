@@ -3,9 +3,6 @@
    Victorian Naturalist Aesthetic
    ═══════════════════════════════════════════ */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Mobile-first full-screen fixes */
 html, body, #root {
