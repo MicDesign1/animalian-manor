@@ -460,6 +460,7 @@ export default function Arena() {
       }));
       return {
         ...c,
+        level: redistCreature.level,
         hp: redistStats.hp, currentHp: redistStats.hp,
         atk: redistStats.atk, def: redistStats.def, spd: redistStats.spd,
         attacks: updatedAttacks,
