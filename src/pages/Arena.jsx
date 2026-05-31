@@ -150,7 +150,7 @@ export default function Arena() {
 
   useEffect(() => { AudioManager.playMusic('/sounds/battle.mp3'); }, []);
 
-  const [collection] = useState(
+  const [collection, setCollection] = useState(
     () => JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]')
   );
 
@@ -210,8 +210,11 @@ export default function Arena() {
   function startBattle() {
     const diff = DIFFICULTY[difficulty];
 
+    // Always re-read from localStorage so we get the latest stats/level,
+    // not a snapshot that may be stale after a previous level-up or save.
+    const freshCollection = JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]');
     const pt = selectedIds.map(id => {
-      const c = collection.find(x => x.id === id);
+      const c = freshCollection.find(x => x.id === id);
       return { ...c, currentHp: c.hp };
     });
 
@@ -443,7 +446,9 @@ export default function Arena() {
             atk: fieldStats.atk, def: fieldStats.def, spd: fieldStats.spd }
         : c
     );
+    // Write first, then sync state — clears happen only after the save is committed.
     localStorage.setItem(profileKey('creatures'), JSON.stringify(updated));
+    setCollection(updated);
     setShowFieldTraining(false);
     setFieldCreature(null);
     setFieldStats(null);
@@ -487,6 +492,9 @@ export default function Arena() {
 
   // ── Reset to team selection ───────────────────────────────────────────────
   function resetBattle() {
+    // Re-read creatures so the selection grid shows updated stats/levels
+    // from any redistribution or field training that just completed.
+    setCollection(JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]'));
     setPhase('selecting');
     setSelectedIds([]);
     setDifficulty('medium');
