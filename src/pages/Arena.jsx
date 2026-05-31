@@ -473,7 +473,8 @@ export default function Arena() {
 
     const currentIdx = levelUps.findIndex(c => c.id === redistCreature.id);
     const next = levelUps.slice(currentIdx + 1).find(c => !c.isLegendary);
-    if (next) {
+    const nextPointsAvailable = 20;
+    if (next && nextPointsAvailable > 0) {
       setRedistCreature(next);
       setRedistStats({
         hp: next.hp, atk: next.atk, def: next.def, spd: next.spd,
@@ -772,7 +773,10 @@ export default function Arena() {
                         {redistCreature && (
                           <button
                             className="winner-redist-btn"
-                            onClick={() => setShowRedist(true)}
+                            onClick={() => {
+                              if (redistRemaining <= 0) navigate('/manor');
+                              else setShowRedist(true);
+                            }}
                           >
                             ✦ Redistribute Stats
                           </button>
@@ -952,9 +956,16 @@ export default function Arena() {
               )}
             </div>
 
-            <button className="redist-confirm-btn" onClick={handleRedistConfirm}>
+            <button
+              className="redist-confirm-btn"
+              onClick={handleRedistConfirm}
+              disabled={redistRemaining !== 0}
+            >
               ✦ Confirm Stats
             </button>
+            {redistRemaining !== 0 && (
+              <p className="redist-spend-hint">Points remaining: {redistRemaining} — spend them all to confirm!</p>
+            )}
 
             {redistEligible.length > 1 && (
               <p className="redist-progress">
