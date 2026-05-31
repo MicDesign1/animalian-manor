@@ -466,6 +466,9 @@ export default function Arena() {
       };
     });
     localStorage.setItem(profileKey('creatures'), JSON.stringify(updated));
+    setPlayerTeam(prev => prev.map(c =>
+      c.id === redistCreature.id ? { ...c, level: redistCreature.level } : c
+    ));
 
     const currentIdx = levelUps.findIndex(c => c.id === redistCreature.id);
     const next = levelUps.slice(currentIdx + 1).find(c => !c.isLegendary);
