@@ -894,7 +894,7 @@ export default function Lab() {
                     </div>
                   </div>
 
-                  <button className="lab-recharge-close" onClick={() => setShowRecharge(false)}>
+                  <button className="lab-recharge-close" onClick={() => navigate('/manor')}>
                     ← Come back when you have enough coins
                   </button>
                 </>

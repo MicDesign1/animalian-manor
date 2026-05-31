@@ -355,6 +355,19 @@ export default function ManorMap() {
   // Measured post-commit spotlight rect — updated by useLayoutEffect below
   const [tutSpotRect, setTutSpotRect] = useState(null);
 
+  // ── Arena victory counter ─────────────────────────────────────────────────
+  // Re-reads on mount (component remounts after Arena navigation) and on
+  // cross-tab storage changes.
+  const [battlesWon, setBattlesWon] = useState(() => getBattlesWon());
+
+  useEffect(() => {
+    function onStorage(e) {
+      if (e.key === profileKey('battles-won')) setBattlesWon(getBattlesWon());
+    }
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   // Measure the map container once (+ on resize) so we can compute spotlight positions
   const mapContainerRef = useRef(null);
   const [containerRect, setContainerRect] = useState(null);
@@ -634,6 +647,25 @@ export default function ManorMap() {
             </button>
           );
         })()}
+      </div>
+
+      {/* ── Arena Victory Meter ── */}
+      <div className="arena-meter">
+        <span className="arena-meter-label">Arena Victories</span>
+        <div className="arena-meter-row">
+          <div className="arena-meter-track">
+            <div
+              className="arena-meter-fill"
+              style={{ width: `${Math.min(100, (battlesWon / 200) * 100)}%` }}
+            />
+          </div>
+          <span
+            className={`arena-meter-icon${battlesWon >= 150 ? ' arena-meter-icon--pulse' : ''}`}
+            title="Something stirs..."
+            aria-hidden="true"
+          >☠️</span>
+        </div>
+        <span className="arena-meter-count">{battlesWon} / 200</span>
       </div>
 
       {/* Room Info Tooltip (shown at bottom on hover) */}
