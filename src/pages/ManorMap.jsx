@@ -663,7 +663,7 @@ export default function ManorMap() {
             className={`arena-meter-icon${battlesWon >= 150 ? ' arena-meter-icon--pulse' : ''}`}
             title="Something stirs..."
             aria-hidden="true"
-          >☠️</span>
+          >🗝️</span>
         </div>
         <span className="arena-meter-count">{battlesWon} / 200</span>
       </div>

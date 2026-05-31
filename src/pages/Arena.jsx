@@ -413,7 +413,11 @@ export default function Arena() {
         const firstEligible = lvlUps.find(c => !c.isLegendary);
         if (firstEligible) {
           setRedistCreature(firstEligible);
-          setRedistStats({ hp: firstEligible.hp, atk: firstEligible.atk, def: firstEligible.def, spd: firstEligible.spd });
+          setRedistStats({
+            hp: firstEligible.hp, atk: firstEligible.atk, def: firstEligible.def, spd: firstEligible.spd,
+            atk0: firstEligible.attacks?.[0]?.damage ?? 5,
+            atk1: firstEligible.attacks?.[1]?.damage ?? 5,
+          });
         }
       }
 
@@ -448,25 +452,36 @@ export default function Arena() {
   // ── Confirm stat redistribution for one leveled-up creature ──────────────
   function handleRedistConfirm() {
     const allCreatures = JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]');
-    const updated = allCreatures.map(c =>
-      c.id === redistCreature.id
-        ? { ...c,
-            hp: redistStats.hp, currentHp: redistStats.hp,
-            atk: redistStats.atk, def: redistStats.def, spd: redistStats.spd }
-        : c
-    );
+    const updated = allCreatures.map(c => {
+      if (c.id !== redistCreature.id) return c;
+      const updatedAttacks = (c.attacks || []).map((a, i) => ({
+        ...a,
+        damage: i === 0 ? (redistStats.atk0 ?? a.damage) : (redistStats.atk1 ?? a.damage),
+      }));
+      return {
+        ...c,
+        hp: redistStats.hp, currentHp: redistStats.hp,
+        atk: redistStats.atk, def: redistStats.def, spd: redistStats.spd,
+        attacks: updatedAttacks,
+      };
+    });
     localStorage.setItem(profileKey('creatures'), JSON.stringify(updated));
 
     const currentIdx = levelUps.findIndex(c => c.id === redistCreature.id);
     const next = levelUps.slice(currentIdx + 1).find(c => !c.isLegendary);
     if (next) {
       setRedistCreature(next);
-      setRedistStats({ hp: next.hp, atk: next.atk, def: next.def, spd: next.spd });
+      setRedistStats({
+        hp: next.hp, atk: next.atk, def: next.def, spd: next.spd,
+        atk0: next.attacks?.[0]?.damage ?? 5,
+        atk1: next.attacks?.[1]?.damage ?? 5,
+      });
     } else {
       setShowRedist(false);
       setLevelUps([]);
       setRedistCreature(null);
       setRedistStats(null);
+      navigate('/manor');
     }
   }
 
@@ -502,9 +517,15 @@ export default function Arena() {
 
   // Level-up redistribution derived values
   const redistEligible  = levelUps.filter(c => !c.isLegendary);
-  const redistPool      = redistCreature ? 200 + ((redistCreature.level || 1) - 1) * 20 : 200;
+  // Pool = creature's current stat sum + 20 new points from this level-up
+  const redistPool = redistCreature
+    ? (redistCreature.hp  - 50) + (redistCreature.atk - 10) + (redistCreature.def - 10) + (redistCreature.spd - 10)
+      + ((redistCreature.attacks?.[0]?.damage ?? 5) - 5) + ((redistCreature.attacks?.[1]?.damage ?? 5) - 5)
+      + 20
+    : 0;
   const redistUsed      = redistStats
     ? (redistStats.hp - 50) + (redistStats.atk - 10) + (redistStats.def - 10) + (redistStats.spd - 10)
+      + ((redistStats.atk0 ?? 5) - 5) + ((redistStats.atk1 ?? 5) - 5)
     : 0;
   const redistRemaining = redistPool - redistUsed;
 
@@ -905,6 +926,26 @@ export default function Arena() {
                 onChange={v => setRedistStats(s => ({ ...s, spd: v }))}
                 remaining={redistRemaining}
               />
+              {redistCreature.attacks?.[0] && redistStats.atk0 != null && (
+                <RedistSlider
+                  label={`${redistCreature.attacks[0].name} dmg`}
+                  value={redistStats.atk0}
+                  min={5}
+                  max={Math.min(redistStats.atk, Math.max(5, Math.floor(redistStats.atk * 1.5) - redistStats.atk1))}
+                  onChange={v => setRedistStats(s => ({ ...s, atk0: v }))}
+                  remaining={redistRemaining}
+                />
+              )}
+              {redistCreature.attacks?.[1] && redistStats.atk1 != null && (
+                <RedistSlider
+                  label={`${redistCreature.attacks[1].name} dmg`}
+                  value={redistStats.atk1}
+                  min={5}
+                  max={Math.min(redistStats.atk, Math.max(5, Math.floor(redistStats.atk * 1.5) - redistStats.atk0))}
+                  onChange={v => setRedistStats(s => ({ ...s, atk1: v }))}
+                  remaining={redistRemaining}
+                />
+              )}
             </div>
 
             <button className="redist-confirm-btn" onClick={handleRedistConfirm}>
