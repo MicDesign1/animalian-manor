@@ -418,10 +418,9 @@ export default function Arena() {
             atk0: firstEligible.attacks?.[0]?.damage ?? 5,
             atk1: firstEligible.attacks?.[1]?.damage ?? 5,
           });
+          setShowRedist(true);
         }
       }
-
-      if (lvlUps.length > 0 && firstEligible) setShowRedist(true);
 
       // Field training always fires after a win — one creature, +5 points (legendaries excluded)
       setFieldParticipants(updatedCreatures.filter(c => participatedIds.has(c.id) && !c.isLegendary));
