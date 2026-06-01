@@ -437,6 +437,9 @@ export default function Arena() {
 
   // ── Confirm field-training bonus (+5 points) for one creature ────────────
   function handleFieldConfirm() {
+    // Must spend all 5 bonus points before confirming
+    if (fieldRemaining !== 0) return;
+
     const allCreatures = JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]');
     const updated = allCreatures.map(c =>
       c.id === fieldCreature.id
@@ -445,9 +448,19 @@ export default function Arena() {
         : c
     );
     localStorage.setItem(profileKey('creatures'), JSON.stringify(updated));
+
+    // Reflect the new stats in the live team too
+    setPlayerTeam(prev => prev.map(c =>
+      c.id === fieldCreature.id
+        ? { ...c, hp: fieldStats.hp, atk: fieldStats.atk, def: fieldStats.def, spd: fieldStats.spd }
+        : c
+    ));
+
+    // Close AND clear participants so the victory button disappears (one training per win)
     setShowFieldTraining(false);
     setFieldCreature(null);
     setFieldStats(null);
+    setFieldParticipants([]);
   }
 
   // ── Confirm stat redistribution for one leveled-up creature ──────────────
@@ -885,9 +898,16 @@ export default function Arena() {
                   />
                 </div>
 
-                <button className="redist-confirm-btn" onClick={handleFieldConfirm}>
+                <button
+                  className="redist-confirm-btn"
+                  onClick={handleFieldConfirm}
+                  disabled={fieldRemaining !== 0}
+                >
                   ✦ Confirm Training
                 </button>
+                {fieldRemaining !== 0 && (
+                  <p className="redist-spend-hint">Points remaining: {fieldRemaining} — spend all 5 to confirm!</p>
+                )}
               </>
             )}
           </div>
