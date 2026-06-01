@@ -421,6 +421,8 @@ export default function Arena() {
         }
       }
 
+      if (lvlUps.length > 0 && firstEligible) setShowRedist(true);
+
       // Field training always fires after a win — one creature, +5 points (legendaries excluded)
       setFieldParticipants(updatedCreatures.filter(c => participatedIds.has(c.id) && !c.isLegendary));
 
@@ -473,8 +475,7 @@ export default function Arena() {
 
     const currentIdx = levelUps.findIndex(c => c.id === redistCreature.id);
     const next = levelUps.slice(currentIdx + 1).find(c => !c.isLegendary);
-    const nextPointsAvailable = 20;
-    if (next && nextPointsAvailable > 0) {
+    if (next) {
       setRedistCreature(next);
       setRedistStats({
         hp: next.hp, atk: next.atk, def: next.def, spd: next.spd,
