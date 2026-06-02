@@ -50,3 +50,23 @@ export function rollInitiative(playerSpeed, enemySpeed) {
 export function initiativeText(playerName, enemyName, r) {
   return `🎲 Initiative — ${playerName}: ${r.pRoll}+${r.pMod}=${r.pTotal}  vs  ${enemyName}: ${r.eRoll}+${r.eMod}=${r.eTotal}`;
 }
+
+// Enemy AI: choose the attack that deals the most damage to the current defender.
+// 80% of the time it picks the optimal attack; 20% it picks randomly, so it still
+// feels like an opponent and not a solver. Returns one attack object.
+export function chooseBestAttack(attacker, defender) {
+  const attacks = attacker.attacks || [];
+  if (attacks.length === 0) return null;
+  if (attacks.length === 1) return attacks[0];
+
+  if (Math.random() < 0.2) {
+    return attacks[Math.floor(Math.random() * attacks.length)];
+  }
+  let best = attacks[0];
+  let bestDmg = calcDamage(attacker, attacks[0], defender);
+  for (let i = 1; i < attacks.length; i++) {
+    const dmg = calcDamage(attacker, attacks[i], defender);
+    if (dmg > bestDmg) { best = attacks[i]; bestDmg = dmg; }
+  }
+  return best;
+}

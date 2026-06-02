@@ -6,7 +6,7 @@ import { profileKey } from '../data/profiles';
 import { setStoryFlag, setJournalPages } from '../data/gameProgress';
 import { LEGENDARY_ART_PATHS } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
-import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText } from '../data/combat';
+import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack } from '../data/combat';
 import InitiativeBanner from '../components/InitiativeBanner';
 import './BasementBattle.css';
 import './Arena.css';
@@ -207,7 +207,7 @@ export default function BasementBattle() {
   // ── Enemy AI: pick a random attack ───────────────────────────────────────
   function runEnemyTurn() {
     const { pt, et, pi, ei } = b.current;
-    const attack = et[ei].attacks[Math.floor(Math.random() * et[ei].attacks.length)];
+    const attack = chooseBestAttack(et[ei], pt[pi]) || et[ei].attacks[0];
     const newHp  = strikeLog(et[ei], attack, pt[pi], false);
 
     const newPt = pt.map((c, i) => i === pi ? { ...c, currentHp: newHp } : c);
