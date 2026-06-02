@@ -6,7 +6,7 @@ import { profileKey } from '../data/profiles';
 import { setStoryFlag, setJournalPages } from '../data/gameProgress';
 import { LEGENDARY_ART_PATHS } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
-import { getMultiplier, calcDamage, isStrongAttack } from '../data/combat';
+import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText } from '../data/combat';
 import './BasementBattle.css';
 import './Arena.css';
 
@@ -122,17 +122,14 @@ export default function BasementBattle() {
     setCooldownFlash(-1);
     setPhase('battling');
 
-    const playerFirst = pt[0].spd >= rz.spd;
+    const init = rollInitiative(pt[0].spd, rz.spd);
+    const playerFirst = init.playerFirst;
     setIsPlayerTurn(playerFirst);
 
     addLog('🎭 "RZ — show them what we found beneath the world."', 'enemy');
     addLog(`${pt[0].name} and ${pt[1].name} step forward.`, 'system');
-    addLog(
-      playerFirst
-        ? `${pt[0].name} moves first! (SPD ${pt[0].spd})`
-        : `RZ strikes first! (SPD ${rz.spd})`,
-      'system'
-    );
+    addLog(initiativeText(pt[0].name, rz.name, init), 'system');
+    addLog(`${playerFirst ? pt[0].name : rz.name} wins initiative and moves first!`, 'system');
 
     if (!playerFirst) {
       setBusy(true);
@@ -247,10 +244,23 @@ export default function BasementBattle() {
     setPlayerIdx(newPi);
     setPlayerCooldowns([0, 0]);
     setCooldownFlash(-1);
-    addLog(`${b.current.pt[newPi].name} enters the battle!`, 'system');
-    setIsPlayerTurn(true);
     setPhase('battling');
-    setBusy(false);
+
+    const { pt, et, ei } = b.current;
+    addLog(`${pt[newPi].name} enters the battle!`, 'system');
+
+    const init = rollInitiative(pt[newPi].spd, et[ei].spd);
+    addLog(initiativeText(pt[newPi].name, et[ei].name, init), 'system');
+    addLog(`${init.playerFirst ? pt[newPi].name : et[ei].name} wins initiative and moves first!`, 'system');
+
+    if (init.playerFirst) {
+      setIsPlayerTurn(true);
+      setBusy(false);
+    } else {
+      setIsPlayerTurn(false);
+      setBusy(true);
+      setTimeout(() => runEnemyTurn(), 1000);
+    }
   }
 
   // ── End the battle ────────────────────────────────────────────────────────

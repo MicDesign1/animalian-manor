@@ -22,7 +22,7 @@ export function getMultiplier(attackType, defenderType, defenderDualType = null)
 }
 
 export function calcDamage(attacker, attack, defender) {
-  const base = Math.max(5, attack.damage + Math.floor((attacker.atk - defender.def) / 4));
+  const base = Math.max(5, attack.damage + Math.floor((attacker.atk - defender.def) / 2));
   return Math.round(base * getMultiplier(attack.type ?? attacker.type, defender.type, defender.dualType));
 }
 
@@ -33,4 +33,20 @@ export function isStrongAttack(attacks, idx) {
   if (!attacks || attacks.length < 2) return false;
   const maxDmg = Math.max(attacks[0].damage, attacks[1].damage);
   return attacks[idx].damage === maxDmg;
+}
+
+export function rollInitiative(playerSpeed, enemySpeed) {
+  const d20 = () => Math.floor(Math.random() * 20) + 1;
+  const mod = s => Math.round((s || 0) / 10); // SPD 10–100 -> +1..+10; d20 stays dominant so upsets are common
+  const pMod = mod(playerSpeed), eMod = mod(enemySpeed);
+  let pRoll, eRoll, pTotal, eTotal;
+  do {
+    pRoll = d20(); eRoll = d20();
+    pTotal = pRoll + pMod; eTotal = eRoll + eMod;
+  } while (pTotal === eTotal); // re-roll exact ties, D&D-style
+  return { playerFirst: pTotal > eTotal, pRoll, eRoll, pMod, eMod, pTotal, eTotal };
+}
+
+export function initiativeText(playerName, enemyName, r) {
+  return `🎲 Initiative — ${playerName}: ${r.pRoll}+${r.pMod}=${r.pTotal}  vs  ${enemyName}: ${r.eRoll}+${r.eMod}=${r.eTotal}`;
 }

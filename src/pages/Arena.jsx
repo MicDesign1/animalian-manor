@@ -6,7 +6,7 @@ import { incrementBattlesWon, checkMilestones } from '../data/gameProgress';
 import { getRandomImage } from '../data/creatureImages';
 import { isReservedArt } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
-import { getMultiplier, calcDamage, isStrongAttack } from '../data/combat';
+import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText } from '../data/combat';
 import './Arena.css';
 
 // ── Pre-made challengers from the manor ──────────────────────────────────────
@@ -201,17 +201,14 @@ export default function Arena() {
     setCooldownFlash(-1);
     setPhase('battling');
 
-    const playerFirst = pt[0].spd >= et[0].spd;
+    const init = rollInitiative(pt[0].spd, et[0].spd);
+    const playerFirst = init.playerFirst;
     setIsPlayerTurn(playerFirst);
 
     addLog(`⚔️ ${diff.icon} ${diff.label} — ${diff.teamSize} challengers step forward!`, 'system');
     addLog(`Your team: ${pt.map(c => c.name).join(', ')}`, 'system');
-    addLog(
-      playerFirst
-        ? `${pt[0].name} moves first! (SPD ${pt[0].spd})`
-        : `${et[0].name} strikes first! (SPD ${et[0].spd})`,
-      'system'
-    );
+    addLog(initiativeText(pt[0].name, et[0].name, init), 'system');
+    addLog(`${playerFirst ? pt[0].name : et[0].name} wins initiative and moves first!`, 'system');
 
     if (!playerFirst) {
       setBusy(true);
@@ -273,8 +270,18 @@ export default function Arena() {
         addLog(`${newEt[nextEi].name} enters the arena!`, 'system');
         b.current = { ...b.current, ei: nextEi };
         setEnemyIdx(nextEi);
-        setIsPlayerTurn(true);
-        setBusy(false);
+
+        const init = rollInitiative(pt[pi].spd, newEt[nextEi].spd);
+        addLog(initiativeText(pt[pi].name, newEt[nextEi].name, init), 'system');
+        addLog(`${init.playerFirst ? pt[pi].name : newEt[nextEi].name} wins initiative and moves first!`, 'system');
+
+        if (init.playerFirst) {
+          setIsPlayerTurn(true);
+          setBusy(false);
+        } else {
+          setIsPlayerTurn(false);
+          setTimeout(() => runEnemyTurn(), 1000);
+        }
       }, 800);
       return;
     }
@@ -328,10 +335,23 @@ export default function Arena() {
     setPlayerIdx(newPi);
     setPlayerCooldowns([0, 0]);
     setCooldownFlash(-1);
-    addLog(`${b.current.pt[newPi].name} enters the arena!`, 'system');
-    setIsPlayerTurn(true);
     setPhase('battling');
-    setBusy(false);
+
+    const { pt, et, ei } = b.current;
+    addLog(`${pt[newPi].name} enters the arena!`, 'system');
+
+    const init = rollInitiative(pt[newPi].spd, et[ei].spd);
+    addLog(initiativeText(pt[newPi].name, et[ei].name, init), 'system');
+    addLog(`${init.playerFirst ? pt[newPi].name : et[ei].name} wins initiative and moves first!`, 'system');
+
+    if (init.playerFirst) {
+      setIsPlayerTurn(true);
+      setBusy(false);
+    } else {
+      setIsPlayerTurn(false);
+      setBusy(true);
+      setTimeout(() => runEnemyTurn(), 1000);
+    }
   }
 
   // ── End the battle ────────────────────────────────────────────────────────
