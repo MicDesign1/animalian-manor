@@ -35,7 +35,7 @@ const DIFFICULTY = {
              desc: 'A gentle introduction' },
   medium: { id: 'medium', icon: '⚔️',  label: 'Medium', statMult: 1.00, teamSize: 3, coinMult: 1.5, xpMult: 2,
              desc: 'A proper challenge' },
-  hard:   { id: 'hard',   icon: '💀', label: 'Hard',   statMult: 1.40, teamSize: 4, coinMult: 2.5, xpMult: 3,
+  hard:   { id: 'hard',   icon: '💀', label: 'Hard',   statMult: 1.40, teamSize: 5, coinMult: 2.5, xpMult: 3,
              desc: 'Fierce manor warriors' },
 };
 
@@ -58,37 +58,39 @@ function scaledChallenger(c, mult) {
 
 const TYPE_POOL = ['ember', 'tide', 'thorn', 'storm', 'phantom', 'iron'];
 
-// Clones the player's strongest card's STATLINE and attack DAMAGE (+2 each, capped),
-// but keeps the chosen template's own attack NAMES and uses a randomized element type.
-function eliteChallenger(bestCard, nameTemplate, level) {
+// Invented creature names so mirrored cards read like normal NPCs, not the player's.
+const MIRROR_NAMES = [
+  'Hollow Warden', 'Grit Maw', 'Ashen Stag', 'Pale Vextor', 'Bramble Knell',
+  'Soot Drake', 'Mire Hound', 'Quill Shade', 'Cinder Roe', 'Slate Vane',
+  'Dusk Harrow', 'Fen Crawler', 'Rust Sentinel', 'Gale Pike', 'Bog Wraith',
+];
+
+// Clones one of the player's cards: stats +2, attack damage +2 (capped at ATK),
+// randomized element type, invented name. Plays like a mirror without announcing it.
+function mirrorClone(srcCard, displayName) {
   const clamp = (v, lo, hi) => Math.round(Math.max(lo, Math.min(hi, v)));
   const newType = TYPE_POOL[Math.floor(Math.random() * TYPE_POOL.length)];
-  const atk = clamp(bestCard.atk + 2, 10, 100);
+  const atk = clamp(srcCard.atk + 2, 10, 100);
   const img = getRandomImage();
-
-  // Copy the player's two attack DAMAGE numbers (+2, capped at the new ATK),
-  // but borrow NAMES from the template challenger so they read like NPC attacks.
-  const srcDmg   = (bestCard.attacks || []).slice(0, 2).map(a => a.damage || 5);
-  const tplNames = (nameTemplate.attacks || []).map(a => a.name);
+  const srcDmg = (srcCard.attacks || []).slice(0, 2).map(a => a.damage || 5);
+  const fallbackNames = ['Rend', 'Maul', 'Lash', 'Crush', 'Gore', 'Smite'];
   const attacks = [0, 1].map(i => ({
-    name:   tplNames[i] || `Strike ${i + 1}`,
+    name:   fallbackNames[Math.floor(Math.random() * fallbackNames.length)],
     type:   newType,
     damage: clamp((srcDmg[i] ?? srcDmg[0] ?? 5) + 2, 5, atk),
   }));
-
   return {
-    ...bestCard,                 // inherit shape; everything below overrides
-    id:    'elite-' + Date.now(),
-    name:  'Elite Rival',
-    isElite: true,
-    level,
+    ...srcCard,
+    id:    'mirror-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+    name:  displayName,
+    isElite: true,            // internal flag for any future styling; not shown as text
     type:  newType,
     dualType: null,
     isLegendary: false,
-    hp:  clamp(bestCard.hp  + 2, 50, 200),
+    hp:  clamp(srcCard.hp  + 2, 50, 200),
     atk,
-    def: clamp(bestCard.def + 2, 10, 100),
-    spd: clamp(bestCard.spd + 2, 10, 100),
+    def: clamp(srcCard.def + 2, 10, 100),
+    spd: clamp(srcCard.spd + 2, 10, 100),
     attacks,
     image: isReservedArt(img) ? getRandomImage() : img,
     imagePosition: { x: 50, y: 50 },
@@ -235,19 +237,29 @@ export default function Arena() {
     if (difficulty === 'hard' && pt.length > 0) {
       const bestLevel = Math.max(...pt.map(c => c.level || 1));
 
-      // Give the whole hard squad a visible level so they don't all read as Lv 1.
+      // Give the whole hard squad a visible level so they don't read as Lv 1.
       const squadLvl = Math.max(1, bestLevel - 1);
       for (let i = 0; i < et.length; i++) et[i] = { ...et[i], level: squadLvl };
 
-      // One Elite that mirrors the player's strongest card's statline and attack
-      // damage (+2 each, capped), with NPC attack names and a randomized type.
-      const bestCard     = pt.reduce((a, c) =>
-        (c.hp + c.atk + c.def + c.spd) > (a.hp + a.atk + a.def + a.spd) ? c : a
+      // Pick the player's strongest cards (by total stats), up to 3, and clone them.
+      const ranked = [...pt].sort((a, b) =>
+        (b.hp + b.atk + b.def + b.spd) - (a.hp + a.atk + a.def + a.spd)
       );
-      const nameTemplate = CHALLENGERS[Math.floor(Math.random() * CHALLENGERS.length)];
-      const elite        = eliteChallenger(bestCard, nameTemplate, bestLevel);
-      const slot         = Math.floor(Math.random() * et.length);
-      et[slot]           = { ...elite, currentHp: elite.hp };
+      const brought = ranked.length;                  // how many cards the player fielded
+      const mirrorCount = brought >= 5 ? 3
+                        : brought === 4 ? 2
+                        : 1;                            // 3 or fewer cards => 1 mirror
+
+      // Unique invented names for this battle.
+      const names = [...MIRROR_NAMES].sort(() => Math.random() - 0.5);
+
+      // Random distinct slots in et to overwrite with mirrors.
+      const slots = [...et.keys()].sort(() => Math.random() - 0.5).slice(0, mirrorCount);
+      slots.forEach((slot, i) => {
+        const clone = mirrorClone(ranked[i], names[i]);
+        clone.level = bestLevel;          // mirrors show the player's top level
+        et[slot] = { ...clone, currentHp: clone.hp };
+      });
     }
 
     b.current = { pt, et, pi: 0, ei: 0, cooldowns: [0, 0], coinMult: diff.coinMult, xpMult: diff.xpMult };
