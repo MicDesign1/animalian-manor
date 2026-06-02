@@ -150,7 +150,7 @@ export default function Arena() {
 
   useEffect(() => { AudioManager.playMusic('/sounds/battle.mp3'); }, []);
 
-  const [collection] = useState(
+  const [collection, setCollection] = useState(
     () => JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]')
   );
 
@@ -506,6 +506,7 @@ export default function Arena() {
   // ── Reset to team selection ───────────────────────────────────────────────
   function resetBattle() {
     setPhase('selecting');
+    setCollection(JSON.parse(localStorage.getItem(profileKey('creatures')) || '[]'));
     setSelectedIds([]);
     setDifficulty('medium');
     setPlayerTeam([]);
