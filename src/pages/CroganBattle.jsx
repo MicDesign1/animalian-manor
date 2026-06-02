@@ -9,6 +9,7 @@ import { getRandomImage } from '../data/creatureImages';
 import { LEGENDARY_ART_PATHS, isReservedArt } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
 import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText } from '../data/combat';
+import InitiativeBanner from '../components/InitiativeBanner';
 import './CroganBattle.css';
 import './Arena.css';
 
@@ -121,6 +122,9 @@ export default function CroganBattle() {
   const [victoryStep,  setVictoryStep]  = useState(0);
   const [selectedIds,  setSelectedIds]  = useState([]);
 
+  // Initiative banner state
+  const [initiativeRoll, setInitiativeRoll] = useState(null);
+
   // Battle state
   const [playerTeam,      setPlayerTeam]      = useState([]);
   const [enemyTeam,       setEnemyTeam]       = useState([]);
@@ -203,6 +207,7 @@ export default function CroganBattle() {
     setPhase('battling');
 
     const init = rollInitiative(pt[0].spd, et[0].spd);
+    setInitiativeRoll({ id: Date.now(), playerName: pt[0].name, enemyName: et[0].name, ...init });
     const playerFirst = init.playerFirst;
     setIsPlayerTurn(playerFirst);
 
@@ -273,6 +278,7 @@ export default function CroganBattle() {
         setEnemyIdx(nextEi);
 
         const init = rollInitiative(pt[pi].spd, newEt[nextEi].spd);
+        setInitiativeRoll({ id: Date.now(), playerName: pt[pi].name, enemyName: newEt[nextEi].name, ...init });
         addLog(initiativeText(pt[pi].name, newEt[nextEi].name, init), 'system');
         addLog(`${init.playerFirst ? pt[pi].name : newEt[nextEi].name} wins initiative and moves first!`, 'system');
 
@@ -342,6 +348,7 @@ export default function CroganBattle() {
     addLog(`${pt[newPi].name} enters the battle!`, 'system');
 
     const init = rollInitiative(pt[newPi].spd, et[ei].spd);
+    setInitiativeRoll({ id: Date.now(), playerName: pt[newPi].name, enemyName: et[ei].name, ...init });
     addLog(initiativeText(pt[newPi].name, et[ei].name, init), 'system');
     addLog(`${init.playerFirst ? pt[newPi].name : et[ei].name} wins initiative and moves first!`, 'system');
 
@@ -518,6 +525,7 @@ export default function CroganBattle() {
       {/* ── BATTLE + SWITCHING ── */}
       {(phase === 'battling' || phase === 'switching') && playerActive && enemyActive && (
         <main className="crogan-battle">
+          <InitiativeBanner roll={initiativeRoll} />
 
           {/* Team status pips */}
           <div className="crogan-teams-row">

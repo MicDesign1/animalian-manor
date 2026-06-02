@@ -7,6 +7,7 @@ import { setStoryFlag, setJournalPages } from '../data/gameProgress';
 import { LEGENDARY_ART_PATHS } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
 import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText } from '../data/combat';
+import InitiativeBanner from '../components/InitiativeBanner';
 import './BasementBattle.css';
 import './Arena.css';
 
@@ -81,6 +82,9 @@ export default function BasementBattle() {
   const [descentStep,  setDescentStep] = useState(0);
   const [victoryStep,  setVictoryStep] = useState(0);
 
+  // Initiative banner state
+  const [initiativeRoll, setInitiativeRoll] = useState(null);
+
   // Battle state
   const [playerTeam,      setPlayerTeam]      = useState([]);
   const [enemyTeam,       setEnemyTeam]       = useState([]);
@@ -123,6 +127,7 @@ export default function BasementBattle() {
     setPhase('battling');
 
     const init = rollInitiative(pt[0].spd, rz.spd);
+    setInitiativeRoll({ id: Date.now(), playerName: pt[0].name, enemyName: rz.name, ...init });
     const playerFirst = init.playerFirst;
     setIsPlayerTurn(playerFirst);
 
@@ -250,6 +255,7 @@ export default function BasementBattle() {
     addLog(`${pt[newPi].name} enters the battle!`, 'system');
 
     const init = rollInitiative(pt[newPi].spd, et[ei].spd);
+    setInitiativeRoll({ id: Date.now(), playerName: pt[newPi].name, enemyName: et[ei].name, ...init });
     addLog(initiativeText(pt[newPi].name, et[ei].name, init), 'system');
     addLog(`${init.playerFirst ? pt[newPi].name : et[ei].name} wins initiative and moves first!`, 'system');
 
@@ -384,6 +390,7 @@ export default function BasementBattle() {
       {/* ── BATTLE + SWITCHING ── */}
       {(phase === 'battling' || phase === 'switching') && playerActive && enemyActive && (
         <main className="basement-battle">
+          <InitiativeBanner roll={initiativeRoll} />
 
           {/* Team status pips */}
           <div className="bsmt-teams-row">

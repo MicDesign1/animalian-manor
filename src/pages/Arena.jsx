@@ -7,6 +7,7 @@ import { getRandomImage } from '../data/creatureImages';
 import { isReservedArt } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
 import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText } from '../data/combat';
+import InitiativeBanner from '../components/InitiativeBanner';
 import './Arena.css';
 
 // ── Pre-made challengers from the manor ──────────────────────────────────────
@@ -52,6 +53,28 @@ function scaledChallenger(c, mult) {
     spd:     s(10,  r(c.spd)),
     attacks: c.attacks.map(a => ({ ...a, damage: s(5, r(a.damage)) })),
     image:   isReservedArt(img) ? getRandomImage() : img,
+  };
+}
+
+// Builds an "Elite" challenger scaled to a target total power, clamped to normal
+// stat ceilings so it can MATCH a maxed player but never exceed the game's caps.
+function eliteChallenger(c, targetPower, level) {
+  const baseTotal = c.hp + c.atk + c.def + c.spd;
+  const f = targetPower / baseTotal;
+  const clamp = (v, lo, hi) => Math.round(Math.max(lo, Math.min(hi, v)));
+  const img = getRandomImage();
+  const atk = clamp(c.atk * f, 10, 100);
+  return {
+    ...c,
+    name: `Elite ${c.name}`,
+    isElite: true,
+    level,
+    hp:  clamp(c.hp  * f, 50, 200),
+    atk,
+    def: clamp(c.def * f, 10, 100),
+    spd: clamp(c.spd * f, 10, 100),
+    attacks: c.attacks.map(a => ({ ...a, damage: clamp(a.damage * (atk / c.atk), 5, 100) })),
+    image: isReservedArt(img) ? getRandomImage() : img,
   };
 }
 
@@ -146,6 +169,9 @@ export default function Arena() {
   const [redistCreature, setRedistCreature]  = useState(null);
   const [redistStats,    setRedistStats]     = useState(null);
 
+  // ── Initiative banner state ──
+  const [initiativeRoll, setInitiativeRoll] = useState(null);
+
   // ── Field-training state (fires after every win) ──
   const [fieldParticipants,  setFieldParticipants]  = useState([]);
   const [showFieldTraining,  setShowFieldTraining]  = useState(false);
@@ -189,6 +215,17 @@ export default function Arena() {
         return { ...scaled, currentHp: scaled.hp };
       });
 
+    // Hard mode: one challenger becomes an Elite tuned to ~110% of the player's
+    // strongest creature, with a matching level — always a real threat.
+    if (difficulty === 'hard' && pt.length > 0) {
+      const bestTotal  = Math.max(...pt.map(c => c.hp + c.atk + c.def + c.spd));
+      const bestLevel  = Math.max(...pt.map(c => c.level || 1));
+      const template   = CHALLENGERS[Math.floor(Math.random() * CHALLENGERS.length)];
+      const elite      = eliteChallenger(template, bestTotal * 1.10, bestLevel);
+      const slot       = Math.floor(Math.random() * et.length);
+      et[slot]         = { ...elite, currentHp: elite.hp };
+    }
+
     b.current = { pt, et, pi: 0, ei: 0, cooldowns: [0, 0], coinMult: diff.coinMult, xpMult: diff.xpMult };
 
     setPlayerTeam(pt);
@@ -202,6 +239,7 @@ export default function Arena() {
     setPhase('battling');
 
     const init = rollInitiative(pt[0].spd, et[0].spd);
+    setInitiativeRoll({ id: Date.now(), playerName: pt[0].name, enemyName: et[0].name, ...init });
     const playerFirst = init.playerFirst;
     setIsPlayerTurn(playerFirst);
 
@@ -272,6 +310,7 @@ export default function Arena() {
         setEnemyIdx(nextEi);
 
         const init = rollInitiative(pt[pi].spd, newEt[nextEi].spd);
+        setInitiativeRoll({ id: Date.now(), playerName: pt[pi].name, enemyName: newEt[nextEi].name, ...init });
         addLog(initiativeText(pt[pi].name, newEt[nextEi].name, init), 'system');
         addLog(`${init.playerFirst ? pt[pi].name : newEt[nextEi].name} wins initiative and moves first!`, 'system');
 
@@ -341,6 +380,7 @@ export default function Arena() {
     addLog(`${pt[newPi].name} enters the arena!`, 'system');
 
     const init = rollInitiative(pt[newPi].spd, et[ei].spd);
+    setInitiativeRoll({ id: Date.now(), playerName: pt[newPi].name, enemyName: et[ei].name, ...init });
     addLog(initiativeText(pt[newPi].name, et[ei].name, init), 'system');
     addLog(`${init.playerFirst ? pt[newPi].name : et[ei].name} wins initiative and moves first!`, 'system');
 
@@ -651,6 +691,7 @@ export default function Arena() {
       {(phase === 'battling' || phase === 'switching' || phase === 'finished')
         && playerActive && enemyActive && (
         <main className="arena-battle">
+          <InitiativeBanner roll={initiativeRoll} />
 
           {/* Team status pips */}
           <div className="teams-row">
