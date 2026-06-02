@@ -56,25 +56,42 @@ function scaledChallenger(c, mult) {
   };
 }
 
-// Builds an "Elite" challenger scaled to a target total power, clamped to normal
-// stat ceilings so it can MATCH a maxed player but never exceed the game's caps.
-function eliteChallenger(c, targetPower, level) {
-  const baseTotal = c.hp + c.atk + c.def + c.spd;
-  const f = targetPower / baseTotal;
+const TYPE_POOL = ['ember', 'tide', 'thorn', 'storm', 'phantom', 'iron'];
+
+// Clones the player's strongest card's STATLINE and attack DAMAGE (+2 each, capped),
+// but keeps the chosen template's own attack NAMES and uses a randomized element type.
+function eliteChallenger(bestCard, nameTemplate, level) {
   const clamp = (v, lo, hi) => Math.round(Math.max(lo, Math.min(hi, v)));
+  const newType = TYPE_POOL[Math.floor(Math.random() * TYPE_POOL.length)];
+  const atk = clamp(bestCard.atk + 2, 10, 100);
   const img = getRandomImage();
-  const atk = clamp(c.atk * f, 10, 100);
+
+  // Copy the player's two attack DAMAGE numbers (+2, capped at the new ATK),
+  // but borrow NAMES from the template challenger so they read like NPC attacks.
+  const srcDmg   = (bestCard.attacks || []).slice(0, 2).map(a => a.damage || 5);
+  const tplNames = (nameTemplate.attacks || []).map(a => a.name);
+  const attacks = [0, 1].map(i => ({
+    name:   tplNames[i] || `Strike ${i + 1}`,
+    type:   newType,
+    damage: clamp((srcDmg[i] ?? srcDmg[0] ?? 5) + 2, 5, atk),
+  }));
+
   return {
-    ...c,
-    name: `Elite ${c.name}`,
+    ...bestCard,                 // inherit shape; everything below overrides
+    id:    'elite-' + Date.now(),
+    name:  'Elite Rival',
     isElite: true,
     level,
-    hp:  clamp(c.hp  * f, 50, 200),
+    type:  newType,
+    dualType: null,
+    isLegendary: false,
+    hp:  clamp(bestCard.hp  + 2, 50, 200),
     atk,
-    def: clamp(c.def * f, 10, 100),
-    spd: clamp(c.spd * f, 10, 100),
-    attacks: c.attacks.map(a => ({ ...a, damage: clamp(a.damage * (atk / c.atk), 5, 100) })),
+    def: clamp(bestCard.def + 2, 10, 100),
+    spd: clamp(bestCard.spd + 2, 10, 100),
+    attacks,
     image: isReservedArt(img) ? getRandomImage() : img,
+    imagePosition: { x: 50, y: 50 },
   };
 }
 
@@ -215,15 +232,22 @@ export default function Arena() {
         return { ...scaled, currentHp: scaled.hp };
       });
 
-    // Hard mode: one challenger becomes an Elite tuned to ~110% of the player's
-    // strongest creature, with a matching level — always a real threat.
     if (difficulty === 'hard' && pt.length > 0) {
-      const bestTotal  = Math.max(...pt.map(c => c.hp + c.atk + c.def + c.spd));
-      const bestLevel  = Math.max(...pt.map(c => c.level || 1));
-      const template   = CHALLENGERS[Math.floor(Math.random() * CHALLENGERS.length)];
-      const elite      = eliteChallenger(template, bestTotal * 1.10, bestLevel);
-      const slot       = Math.floor(Math.random() * et.length);
-      et[slot]         = { ...elite, currentHp: elite.hp };
+      const bestLevel = Math.max(...pt.map(c => c.level || 1));
+
+      // Give the whole hard squad a visible level so they don't all read as Lv 1.
+      const squadLvl = Math.max(1, bestLevel - 1);
+      for (let i = 0; i < et.length; i++) et[i] = { ...et[i], level: squadLvl };
+
+      // One Elite that mirrors the player's strongest card's statline and attack
+      // damage (+2 each, capped), with NPC attack names and a randomized type.
+      const bestCard     = pt.reduce((a, c) =>
+        (c.hp + c.atk + c.def + c.spd) > (a.hp + a.atk + a.def + a.spd) ? c : a
+      );
+      const nameTemplate = CHALLENGERS[Math.floor(Math.random() * CHALLENGERS.length)];
+      const elite        = eliteChallenger(bestCard, nameTemplate, bestLevel);
+      const slot         = Math.floor(Math.random() * et.length);
+      et[slot]           = { ...elite, currentHp: elite.hp };
     }
 
     b.current = { pt, et, pi: 0, ei: 0, cooldowns: [0, 0], coinMult: diff.coinMult, xpMult: diff.xpMult };
