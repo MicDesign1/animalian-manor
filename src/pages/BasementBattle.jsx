@@ -6,6 +6,7 @@ import { profileKey } from '../data/profiles';
 import { setStoryFlag, setJournalPages } from '../data/gameProgress';
 import { LEGENDARY_ART_PATHS } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
+import { getMultiplier, calcDamage, isStrongAttack } from '../data/combat';
 import './BasementBattle.css';
 import './Arena.css';
 
@@ -24,40 +25,6 @@ const RZ_BASE = {
   isLegendary: true,
   image: LEGENDARY_ART_PATHS.rz,
 };
-
-// ── Type chart + damage (matches Arena / CroganBattle) ────────────────────────
-function getMultiplier(attackType, defenderType, defenderDualType = null) {
-  function singleMult(aType, dType) {
-    if (dType  === 'phantom') return 0.75;
-    if (aType  === 'phantom') return 1.25;
-    if (aType  === 'iron')    return 1.0;
-    const chart = {
-      ember: { strong: 'thorn', weak: 'tide'  },
-      tide:  { strong: 'ember', weak: 'storm' },
-      thorn: { strong: 'tide',  weak: 'ember' },
-      storm: { strong: 'tide',  weak: 'thorn' },
-    };
-    const row = chart[aType];
-    if (!row) return 1.0;
-    if (row.strong === dType) return 1.5;
-    if (row.weak   === dType) return 0.75;
-    return 1.0;
-  }
-  const primaryMult = singleMult(attackType, defenderType);
-  if (!defenderDualType) return primaryMult;
-  return Math.min(primaryMult, singleMult(attackType, defenderDualType));
-}
-
-function calcDamage(attacker, attack, defender) {
-  const base = Math.max(5, attack.damage + Math.floor((attacker.atk - defender.def) / 4));
-  return Math.round(base * getMultiplier(attack.type ?? attacker.type, defender.type, defender.dualType));
-}
-
-function getStrongIdx(attacks) {
-  if (!attacks || attacks.length < 2) return -1;
-  if (attacks[0].damage === attacks[1].damage) return -1;
-  return attacks[0].damage > attacks[1].damage ? 0 : 1;
-}
 
 // ── HP bar ────────────────────────────────────────────────────────────────────
 function HpBar({ current, max }) {
@@ -182,13 +149,13 @@ export default function BasementBattle() {
     const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
     let tag = '';
     if (mult > 1) {
-      tag = atkType?.toLowerCase() === 'phantom'
+      tag = defender.type?.toLowerCase() === 'phantom'
+        ? ' ✨ Phantom is fragile — it takes extra damage!'
+        : atkType?.toLowerCase() === 'phantom'
         ? ' ✨ Phantom strikes all types harder!'
         : ` ✨ ${cap(atkType)} is strong against ${cap(defender.type)}!`;
     } else if (mult < 1) {
-      tag = defender.type?.toLowerCase() === 'phantom'
-        ? ' 😬 Phantom absorbs some of that damage.'
-        : ` 😬 ${cap(defender.type)} resists that attack.`;
+      tag = ` 😬 ${cap(defender.type)} resists that attack.`;
     }
     addLog(
       `${attacker.name} used ${attack.name}! Dealt ${dmg} damage.${tag}`,
@@ -205,8 +172,7 @@ export default function BasementBattle() {
 
     const { pt, et, pi, ei } = b.current;
 
-    const strongIdx = getStrongIdx(pt[pi].attacks);
-    if (attackIdx === strongIdx) {
+    if (isStrongAttack(pt[pi].attacks, attackIdx)) {
       b.current.cooldowns = b.current.cooldowns.map((cd, i) => i === attackIdx ? 2 : cd);
       setPlayerCooldowns([...b.current.cooldowns]);
     }
@@ -320,7 +286,6 @@ export default function BasementBattle() {
   // ── Derived values ────────────────────────────────────────────────────────
   const playerActive = playerTeam[playerIdx];
   const enemyActive  = enemyTeam[enemyIdx];
-  const strongIdx    = playerActive ? getStrongIdx(playerActive.attacks) : -1;
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -448,7 +413,7 @@ export default function BasementBattle() {
                   {playerActive.attacks.map((attack, i) => {
                     const onCooldown = playerCooldowns[i] > 0;
                     const isFlashing = cooldownFlash === i;
-                    const isStrong   = i === strongIdx;
+                    const isStrong   = isStrongAttack(playerActive.attacks, i);
                     return (
                       <button
                         key={i}

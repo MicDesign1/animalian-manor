@@ -6,6 +6,7 @@ import { incrementBattlesWon, checkMilestones } from '../data/gameProgress';
 import { getRandomImage } from '../data/creatureImages';
 import { isReservedArt } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
+import { getMultiplier, calcDamage, isStrongAttack } from '../data/combat';
 import './Arena.css';
 
 // ── Pre-made challengers from the manor ──────────────────────────────────────
@@ -26,12 +27,14 @@ const CHALLENGERS = [
 
 // ── Difficulty settings ───────────────────────────────────────────────────────
 // statMult scales all enemy stats; coinMult rewards more coins for harder runs.
+const FIELD_BONUS_CAP = 40; // max lifetime field-training points per creature (8 trainings)
+
 const DIFFICULTY = {
-  easy:   { id: 'easy',   icon: '🌿', label: 'Easy',   statMult: 0.68, teamSize: 2, coinMult: 1.0,
+  easy:   { id: 'easy',   icon: '🌿', label: 'Easy',   statMult: 0.68, teamSize: 2, coinMult: 1.0, xpMult: 1,
              desc: 'A gentle introduction' },
-  medium: { id: 'medium', icon: '⚔️',  label: 'Medium', statMult: 1.00, teamSize: 3, coinMult: 1.5,
+  medium: { id: 'medium', icon: '⚔️',  label: 'Medium', statMult: 1.00, teamSize: 3, coinMult: 1.5, xpMult: 2,
              desc: 'A proper challenge' },
-  hard:   { id: 'hard',   icon: '💀', label: 'Hard',   statMult: 1.40, teamSize: 4, coinMult: 2.5,
+  hard:   { id: 'hard',   icon: '💀', label: 'Hard',   statMult: 1.40, teamSize: 4, coinMult: 2.5, xpMult: 3,
              desc: 'Fierce manor warriors' },
 };
 
@@ -50,43 +53,6 @@ function scaledChallenger(c, mult) {
     attacks: c.attacks.map(a => ({ ...a, damage: s(5, r(a.damage)) })),
     image:   isReservedArt(img) ? getRandomImage() : img,
   };
-}
-
-// ── Type advantage chart ─────────────────────────────────────────────────────
-function getMultiplier(attackType, defenderType, defenderDualType = null) {
-  function singleMult(aType, dType) {
-    if (dType  === 'phantom') return 0.75;
-    if (aType  === 'phantom') return 1.25;
-    if (aType  === 'iron')    return 1.0;
-    const chart = {
-      ember: { strong: 'thorn', weak: 'tide'  },
-      tide:  { strong: 'ember', weak: 'storm' },
-      thorn: { strong: 'tide',  weak: 'ember' },
-      storm: { strong: 'tide',  weak: 'thorn' },
-    };
-    const row = chart[aType];
-    if (!row) return 1.0;
-    if (row.strong === dType) return 1.5;
-    if (row.weak   === dType) return 0.75;
-    return 1.0;
-  }
-  const primaryMult = singleMult(attackType, defenderType);
-  if (!defenderDualType) return primaryMult;
-  // Dual-type: use the more favourable (lower) multiplier for the defender
-  return Math.min(primaryMult, singleMult(attackType, defenderDualType));
-}
-
-function calcDamage(attacker, attack, defender) {
-  const base = Math.max(5, attack.damage + Math.floor((attacker.atk - defender.def) / 4));
-  return Math.round(base * getMultiplier(attack.type ?? attacker.type, defender.type, defender.dualType));
-}
-
-// ── Returns the index of the higher-damage attack, or -1 if both are equal ───
-// -1 means no cooldown applies (equal damage = symmetric attacks).
-function getStrongIdx(attacks) {
-  if (!attacks || attacks.length < 2) return -1;
-  if (attacks[0].damage === attacks[1].damage) return -1;
-  return attacks[0].damage > attacks[1].damage ? 0 : 1;
 }
 
 // ── HP bar ───────────────────────────────────────────────────────────────────
@@ -223,7 +189,7 @@ export default function Arena() {
         return { ...scaled, currentHp: scaled.hp };
       });
 
-    b.current = { pt, et, pi: 0, ei: 0, cooldowns: [0, 0], coinMult: diff.coinMult };
+    b.current = { pt, et, pi: 0, ei: 0, cooldowns: [0, 0], coinMult: diff.coinMult, xpMult: diff.xpMult };
 
     setPlayerTeam(pt);
     setEnemyTeam(et);
@@ -262,13 +228,13 @@ export default function Arena() {
     const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
     let tag = '';
     if (mult > 1) {
-      tag = atkType?.toLowerCase() === 'phantom'
+      tag = defender.type?.toLowerCase() === 'phantom'
+        ? ' ✨ Phantom is fragile — it takes extra damage!'
+        : atkType?.toLowerCase() === 'phantom'
         ? ' ✨ Phantom strikes all types harder!'
         : ` ✨ ${cap(atkType)} is strong against ${cap(defender.type)}!`;
     } else if (mult < 1) {
-      tag = defender.type?.toLowerCase() === 'phantom'
-        ? ' 😬 Phantom absorbs some of that damage.'
-        : ` 😬 ${cap(defender.type)} resists that attack.`;
+      tag = ` 😬 ${cap(defender.type)} resists that attack.`;
     }
     addLog(
       `${attacker.name} used ${attack.name}! Dealt ${dmg} damage.${tag}`,
@@ -286,8 +252,7 @@ export default function Arena() {
     const { pt, et, pi, ei } = b.current;
 
     // Set 2-turn cooldown on the strong attack when used
-    const strongIdx = getStrongIdx(pt[pi].attacks);
-    if (attackIdx === strongIdx) {
+    if (isStrongAttack(pt[pi].attacks, attackIdx)) {
       b.current.cooldowns = b.current.cooldowns.map((cd, i) => i === attackIdx ? 2 : cd);
       setPlayerCooldowns([...b.current.cooldowns]);
     }
@@ -395,7 +360,7 @@ export default function Arena() {
       const updatedCreatures = allCreatures.map(c => {
         if (!participatedIds.has(c.id)) return c;
         const level     = c.level || 1;
-        const newXp     = (c.xp || 0) + 1;
+        const newXp     = (c.xp || 0) + (b.current.xpMult ?? 1);
         const threshold = level * 3;
         if (newXp >= threshold && level < 10) {
           const newLevel = level + 1;
@@ -422,8 +387,10 @@ export default function Arena() {
         }
       }
 
-      // Field training always fires after a win — one creature, +5 points (legendaries excluded)
-      setFieldParticipants(updatedCreatures.filter(c => participatedIds.has(c.id) && !c.isLegendary));
+      // Field training fires after a win — one creature, +5 points (legendaries and capped creatures excluded)
+      setFieldParticipants(updatedCreatures.filter(c =>
+        participatedIds.has(c.id) && !c.isLegendary && (c.fieldBonus || 0) < FIELD_BONUS_CAP
+      ));
 
       AudioManager.playSfx('/sounds/crowd-cheer.mp3');
     } else {
@@ -444,7 +411,8 @@ export default function Arena() {
     const updated = allCreatures.map(c =>
       c.id === fieldCreature.id
         ? { ...c, hp: fieldStats.hp, currentHp: fieldStats.hp,
-            atk: fieldStats.atk, def: fieldStats.def, spd: fieldStats.spd }
+            atk: fieldStats.atk, def: fieldStats.def, spd: fieldStats.spd,
+            fieldBonus: (c.fieldBonus || 0) + 5 }
         : c
     );
     localStorage.setItem(profileKey('creatures'), JSON.stringify(updated));
@@ -531,8 +499,6 @@ export default function Arena() {
   const enemyActive  = enemyTeam[enemyIdx];
   const maxSelect    = Math.min(5, collection.length);
 
-  // Strong-attack index for the current active creature (-1 = no cooldown)
-  const strongIdx = playerActive ? getStrongIdx(playerActive.attacks) : -1;
 
   // Level-up redistribution derived values
   const redistEligible  = levelUps.filter(c => !c.isLegendary);
@@ -704,7 +670,7 @@ export default function Arena() {
                   {playerActive.attacks.map((attack, i) => {
                     const onCooldown = playerCooldowns[i] > 0;
                     const isFlashing = cooldownFlash === i;
-                    const isStrong   = i === strongIdx;
+                    const isStrong   = isStrongAttack(playerActive.attacks, i);
                     return (
                       <button
                         key={i}
