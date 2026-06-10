@@ -145,7 +145,7 @@ export default function CroganBattle() {
     id: 'genesis-' + Date.now(),
     name: 'Genesis', type: 'storm', dualType: 'ember',
     hp: 270, currentHp: 270, atk: 130, def: 110, spd: 120,
-    level: 10, xp: 0, isLegendary: true,
+    level: 10, xp: 0, isLegendary: true, statsVersion: 1,
     attacks: [
       { name: 'Stormflare',  damage: 75, type: 'storm' },
       { name: 'Ember Surge', damage: 70, type: 'ember' },
@@ -157,7 +157,7 @@ export default function CroganBattle() {
     id: 'rekron-' + Date.now(),
     name: 'Rekron', type: 'ember', dualType: 'iron',
     hp: 260, currentHp: 260, atk: 135, def: 125, spd: 88,
-    level: 10, xp: 0, isLegendary: true,
+    level: 10, xp: 0, isLegendary: true, statsVersion: 1,
     attacks: [
       { name: 'Forge Fire', damage: 80, type: 'ember' },
       { name: 'Iron Blaze', damage: 68, type: 'iron'  },
@@ -419,6 +419,7 @@ export default function CroganBattle() {
     setStoryFlag('mira-bully-quest-complete', true);
     setStoryFlag('genesis-received', true);
     setStoryFlag('rekron-received', true);
+    setStoryFlag('legendary-boost-notified', true); // new owners already have full stats — skip the upgrade message
     setJournalPages(3);
 
     navigate('/parlor');
@@ -704,8 +705,8 @@ export default function CroganBattle() {
         subtitle="Dual Type: Storm · Ember"
         paragraphs={[
           "A creature born of lightning and flame — the sky's fury given form.",
-          "HP: 210 · ATK: 105 · DEF: 85 · SPD: 95",
-          "Attacks: Stormflare (Storm, 60 dmg) · Ember Surge (Ember, 55 dmg)",
+          "HP: 270 · ATK: 130 · DEF: 110 · SPD: 120",
+          "Attacks: Stormflare (Storm, 75 dmg) · Ember Surge (Ember, 70 dmg)",
           "\"Genesis was the first dual-type creature your uncle ever created. Two elements in perfect balance — the strengths of both, the weaknesses of neither.\" — Mira",
         ]}
         buttonText="Continue →"
@@ -721,8 +722,8 @@ export default function CroganBattle() {
         subtitle="Dual Type: Ember · Iron"
         paragraphs={[
           "A creature forged in fire and tempered in iron — relentless, unyielding, unstoppable.",
-          "HP: 200 · ATK: 110 · DEF: 100 · SPD: 70",
-          "Attacks: Forge Fire (Ember, 65 dmg) · Iron Blaze (Iron, 52 dmg)",
+          "HP: 260 · ATK: 135 · DEF: 125 · SPD: 88",
+          "Attacks: Forge Fire (Ember, 80 dmg) · Iron Blaze (Iron, 68 dmg)",
           "\"Rekron was the second. Your uncle said some forces were never meant to be separated. Fire and iron — destruction and endurance, forged as one.\" — Mira",
         ]}
         buttonText="Welcome them both →"

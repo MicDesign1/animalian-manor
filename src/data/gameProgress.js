@@ -25,6 +25,7 @@ const DEFAULT_FLAGS = {
   'old-wren-page-delivered':   false,
   'study-page-hidden':         false, // page 3 is findable inside the Study
   'ransack-triggered':         false,
+  'legendary-boost-notified':  false, // set true once the "awakening" upgrade message is shown
   'basement-discovered':       false,
   'masked-man-defeated':       false,
   'final-letter-delivered':    false,
@@ -224,6 +225,58 @@ export function migrateLegendaryCreatureArt() {
         return { ...c, image: replacement };
       });
 
+      if (changed) localStorage.setItem(creaturesKey, JSON.stringify(updated));
+    } catch { /* corrupt data — leave untouched */ }
+  }
+}
+
+// ── Legendary stat migration ──────────────────────────────────────────────────
+// V1 boosted stats for Genesis and Rekron.  Any creature in localStorage that
+// matches these names but lacks statsVersion >= 1 will be upgraded automatically.
+// The upgrade preserves xp, id, image, imagePosition, and any field-training
+// progress — only the battle stats, level, and attacks are overwritten.
+// Run once at startup (main.jsx) before React mounts, same pattern as above.
+
+const LEGENDARY_V1 = {
+  Genesis: {
+    hp: 270, atk: 130, def: 110, spd: 120, level: 10,
+    attacks: [
+      { name: 'Stormflare',  damage: 75, type: 'storm' },
+      { name: 'Ember Surge', damage: 70, type: 'ember' },
+    ],
+  },
+  Rekron: {
+    hp: 260, atk: 135, def: 125, spd: 88, level: 10,
+    attacks: [
+      { name: 'Forge Fire', damage: 80, type: 'ember' },
+      { name: 'Iron Blaze', damage: 68, type: 'iron'  },
+    ],
+  },
+};
+
+export function migrateLegendaryStats() {
+  const profiles = getProfiles();
+  const prefixes = [...profiles.map(p => `${p.name}_`), ''];
+
+  for (const prefix of prefixes) {
+    const creaturesKey = `${prefix}creatures`;
+    const raw = localStorage.getItem(creaturesKey);
+    if (!raw) continue;
+    try {
+      const creatures = JSON.parse(raw);
+      let changed = false;
+      const updated = creatures.map(c => {
+        const v1 = LEGENDARY_V1[c.name];
+        // Skip creatures that aren't legendary targets, or are already at v1
+        if (!v1 || (c.statsVersion ?? 0) >= 1) return c;
+        changed = true;
+        return {
+          ...c,               // keep xp, id, image, imagePosition, any bonus fields
+          ...v1,              // overwrite hp/atk/def/spd/level/attacks
+          currentHp: v1.hp,   // reset currentHp to new max
+          statsVersion: 1,
+        };
+      });
       if (changed) localStorage.setItem(creaturesKey, JSON.stringify(updated));
     } catch { /* corrupt data — leave untouched */ }
   }

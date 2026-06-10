@@ -281,6 +281,7 @@ export default function ManorMap() {
   const [showLawyerJournal,   setShowLawyerJournal]    = useState(false);
   const [showRansackPainting, setShowRansackPainting]  = useState(false);
   const [showRansackJournal,  setShowRansackJournal]   = useState(false);
+  const [showLegendaryBoost,  setShowLegendaryBoost]   = useState(false);
   const [showFinalEnding,     setShowFinalEnding]      = useState(false);
   const [trapdoorVisible,     setTrapdoorVisible]      = useState(
     () => getStoryFlag('ransack-triggered') && !getStoryFlag('basement-discovered')
@@ -299,6 +300,16 @@ export default function ManorMap() {
     if (merged.length > 0) {
       setActiveEvent(merged[0]);
       setEventQueue(merged.slice(1));
+    }
+
+    // Show a one-time "awakening" message if this profile owns Genesis or Rekron
+    // and has not yet seen the legendary power upgrade notification.
+    // (New recipients have 'legendary-boost-notified' set in completeVictory so they skip this.)
+    if (
+      (getStoryFlag('genesis-received') || getStoryFlag('rekron-received')) &&
+      !getStoryFlag('legendary-boost-notified')
+    ) {
+      setShowLegendaryBoost(true);
     }
   }, []); // eslint-disable-line
 
@@ -713,6 +724,25 @@ export default function ManorMap() {
         paragraphs={JOURNAL_PAGE_2.paragraphs}
         buttonText="Close"
         onClose={handleJournalPage2Close}
+      />
+
+      {/* Legendary Power Awakened — one-time upgrade message for existing owners */}
+      <StoryLetter
+        visible={showLegendaryBoost}
+        type="narrative"
+        icon="⭐"
+        title="Ancient Power Awakened"
+        subtitle="Your legendary companions have grown"
+        paragraphs={[
+          "While you were away on your adventures, something remarkable stirred within your legendary companions.",
+          "Genesis and Rekron — the rarest creatures in Uncle Argon's legacy — have awakened to a greater power. Their bond with you has deepened, and their abilities reflect it.",
+          "Seek them out in your Menagerie. You may find them rather more impressive than you remember.",
+        ]}
+        buttonText="Magnificent!"
+        onClose={() => {
+          setStoryFlag('legendary-boost-notified', true);
+          setShowLegendaryBoost(false);
+        }}
       />
 
       {/* Ransack — Screen 1: Something is Wrong */}
