@@ -6,7 +6,7 @@ import { incrementBattlesWon, checkMilestones } from '../data/gameProgress';
 import { getRandomImage } from '../data/creatureImages';
 import { isReservedArt } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
-import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack } from '../data/combat';
+import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack, rollGroundshaking } from '../data/combat';
 import InitiativeBanner from '../components/InitiativeBanner';
 import './Arena.css';
 
@@ -177,6 +177,7 @@ export default function Arena() {
   const [busy,         setBusy]         = useState(false);
   const [winner,       setWinner]       = useState(null);
   const [coinsEarned,  setCoinsEarned]  = useState(0);
+  const [groundshaking, setGroundshaking] = useState(false); // legendary Groundshaking Attack visual
 
   // ── Cooldown state ── [attackIdx0, attackIdx1] = turns remaining
   const [playerCooldowns, setPlayerCooldowns] = useState([0, 0]);
@@ -294,7 +295,17 @@ export default function Arena() {
   function strikeLog(attacker, attack, defender, isPlayer) {
     const atkType = attack.type ?? attacker.type;
     const dmg  = calcDamage(attacker, attack, defender);
-    AudioManager.playHit(atkType, dmg, defender.hp);
+
+    // Groundshaking Attack — legendary creatures get a 20% chance at 1.5× damage
+    const gs = rollGroundshaking(attacker);
+    const finalDmg = gs.triggered ? Math.round(dmg * 1.5) : dmg;
+    if (gs.triggered) {
+      setGroundshaking(true);
+      setTimeout(() => setGroundshaking(false), 650);
+      AudioManager.playSfx('/sounds/groundshake.mp3');
+    }
+
+    AudioManager.playHit(atkType, finalDmg, defender.hp);
     const mult = getMultiplier(atkType, defender.type, defender.dualType);
     const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
     let tag = '';
@@ -307,11 +318,12 @@ export default function Arena() {
     } else if (mult < 1) {
       tag = ` 😬 ${cap(defender.type)} resists that attack.`;
     }
+    const gsTag = gs.triggered ? ' 💥 GROUNDSHAKING STRIKE!' : '';
     addLog(
-      `${attacker.name} used ${attack.name}! Dealt ${dmg} damage.${tag}`,
+      `${attacker.name} used ${attack.name}! Dealt ${finalDmg} damage.${tag}${gsTag}`,
       isPlayer ? 'player' : 'enemy'
     );
-    return Math.max(0, defender.currentHp - dmg);
+    return Math.max(0, defender.currentHp - finalDmg);
   }
 
   // ── Player picks an attack ────────────────────────────────────────────────
@@ -621,7 +633,7 @@ export default function Arena() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="arena-page">
+    <div className={`arena-page${groundshaking ? ' groundshaking' : ''}`}>
 
       {/* Header */}
       <header className="arena-header">

@@ -6,7 +6,7 @@ import { profileKey } from '../data/profiles';
 import { setStoryFlag, setJournalPages } from '../data/gameProgress';
 import { LEGENDARY_ART_PATHS } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
-import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack } from '../data/combat';
+import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack, rollGroundshaking } from '../data/combat';
 import InitiativeBanner from '../components/InitiativeBanner';
 import './BasementBattle.css';
 import './Arena.css';
@@ -17,11 +17,11 @@ const RZ_BASE = {
   name:      'RZ',
   type:      'iron',
   dualType:  'tide',
-  hp: 320, atk: 115, def: 105, spd: 55,
-  level: 9,
+  hp: 400, atk: 140, def: 130, spd: 70,
+  level: 10,
   attacks: [
-    { name: 'Tidal Crush',  damage: 70, type: 'tide' },
-    { name: 'Iron Torrent', damage: 65, type: 'iron' },
+    { name: 'Tidal Crush',  damage: 88, type: 'tide' },
+    { name: 'Iron Torrent', damage: 80, type: 'iron' },
   ],
   isLegendary: true,
   image: LEGENDARY_ART_PATHS.rz,
@@ -95,6 +95,7 @@ export default function BasementBattle() {
   const [busy,            setBusy]            = useState(false);
   const [playerCooldowns, setPlayerCooldowns] = useState([0, 0]);
   const [cooldownFlash,   setCooldownFlash]   = useState(-1);
+  const [groundshaking, setGroundshaking] = useState(false); // legendary Groundshaking Attack visual
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -146,7 +147,17 @@ export default function BasementBattle() {
   function strikeLog(attacker, attack, defender, isPlayer) {
     const atkType = attack.type ?? attacker.type;
     const dmg  = calcDamage(attacker, attack, defender);
-    AudioManager.playHit(atkType, dmg, defender.hp);
+
+    // Groundshaking Attack — legendary creatures get a 20% chance at 1.5× damage
+    const gs = rollGroundshaking(attacker);
+    const finalDmg = gs.triggered ? Math.round(dmg * 1.5) : dmg;
+    if (gs.triggered) {
+      setGroundshaking(true);
+      setTimeout(() => setGroundshaking(false), 650);
+      AudioManager.playSfx('/sounds/groundshake.mp3');
+    }
+
+    AudioManager.playHit(atkType, finalDmg, defender.hp);
     const mult = getMultiplier(atkType, defender.type, defender.dualType);
     const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
     let tag = '';
@@ -159,11 +170,12 @@ export default function BasementBattle() {
     } else if (mult < 1) {
       tag = ` 😬 ${cap(defender.type)} resists that attack.`;
     }
+    const gsTag = gs.triggered ? ' 💥 GROUNDSHAKING STRIKE!' : '';
     addLog(
-      `${attacker.name} used ${attack.name}! Dealt ${dmg} damage.${tag}`,
+      `${attacker.name} used ${attack.name}! Dealt ${finalDmg} damage.${tag}${gsTag}`,
       isPlayer ? 'player' : 'enemy'
     );
-    return Math.max(0, defender.currentHp - dmg);
+    return Math.max(0, defender.currentHp - finalDmg);
   }
 
   // ── Player picks an attack ────────────────────────────────────────────────
@@ -305,7 +317,7 @@ export default function BasementBattle() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="basement-page">
+    <div className={`basement-page${groundshaking ? ' groundshaking' : ''}`}>
       {/* Atmospheric candlelight effect */}
       <div className="basement-candlelight" aria-hidden />
 

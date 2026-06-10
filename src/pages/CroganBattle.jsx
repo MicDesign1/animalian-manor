@@ -8,7 +8,7 @@ import { setStoryFlag, setJournalPages } from '../data/gameProgress';
 import { getRandomImage } from '../data/creatureImages';
 import { LEGENDARY_ART_PATHS, isReservedArt } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
-import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack } from '../data/combat';
+import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack, rollGroundshaking } from '../data/combat';
 import InitiativeBanner from '../components/InitiativeBanner';
 import './CroganBattle.css';
 import './Arena.css';
@@ -135,6 +135,7 @@ export default function CroganBattle() {
   const [busy,            setBusy]            = useState(false);
   const [playerCooldowns, setPlayerCooldowns] = useState([0, 0]);
   const [cooldownFlash,   setCooldownFlash]   = useState(-1);
+  const [groundshaking, setGroundshaking] = useState(false); // legendary Groundshaking Attack visual
 
   // Mutable ref for async-safe reads inside setTimeout callbacks
   const b = useRef(null);
@@ -143,11 +144,11 @@ export default function CroganBattle() {
   const genesisRef = useRef({
     id: 'genesis-' + Date.now(),
     name: 'Genesis', type: 'storm', dualType: 'ember',
-    hp: 210, currentHp: 210, atk: 105, def: 85, spd: 95,
-    level: 7, xp: 0, isLegendary: true,
+    hp: 270, currentHp: 270, atk: 130, def: 110, spd: 120,
+    level: 10, xp: 0, isLegendary: true,
     attacks: [
-      { name: 'Stormflare',  damage: 60, type: 'storm' },
-      { name: 'Ember Surge', damage: 55, type: 'ember' },
+      { name: 'Stormflare',  damage: 75, type: 'storm' },
+      { name: 'Ember Surge', damage: 70, type: 'ember' },
     ],
     image: LEGENDARY_ART_PATHS.genesis, imagePosition: { x: 50, y: 50 },
   });
@@ -155,11 +156,11 @@ export default function CroganBattle() {
   const rekronRef = useRef({
     id: 'rekron-' + Date.now(),
     name: 'Rekron', type: 'ember', dualType: 'iron',
-    hp: 200, currentHp: 200, atk: 110, def: 100, spd: 70,
-    level: 7, xp: 0, isLegendary: true,
+    hp: 260, currentHp: 260, atk: 135, def: 125, spd: 88,
+    level: 10, xp: 0, isLegendary: true,
     attacks: [
-      { name: 'Forge Fire', damage: 65, type: 'ember' },
-      { name: 'Iron Blaze', damage: 52, type: 'iron'  },
+      { name: 'Forge Fire', damage: 80, type: 'ember' },
+      { name: 'Iron Blaze', damage: 68, type: 'iron'  },
     ],
     image: LEGENDARY_ART_PATHS.rekron, imagePosition: { x: 50, y: 50 },
   });
@@ -227,7 +228,17 @@ export default function CroganBattle() {
   function strikeLog(attacker, attack, defender, isPlayer) {
     const atkType = attack.type ?? attacker.type;
     const dmg  = calcDamage(attacker, attack, defender);
-    AudioManager.playHit(atkType, dmg, defender.hp);
+
+    // Groundshaking Attack — legendary creatures get a 20% chance at 1.5× damage
+    const gs = rollGroundshaking(attacker);
+    const finalDmg = gs.triggered ? Math.round(dmg * 1.5) : dmg;
+    if (gs.triggered) {
+      setGroundshaking(true);
+      setTimeout(() => setGroundshaking(false), 650);
+      AudioManager.playSfx('/sounds/groundshake.mp3');
+    }
+
+    AudioManager.playHit(atkType, finalDmg, defender.hp);
     const mult = getMultiplier(atkType, defender.type, defender.dualType);
     const cap  = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
     let tag = '';
@@ -240,11 +251,12 @@ export default function CroganBattle() {
     } else if (mult < 1) {
       tag = ` 😬 ${cap(defender.type)} resists that attack.`;
     }
+    const gsTag = gs.triggered ? ' 💥 GROUNDSHAKING STRIKE!' : '';
     addLog(
-      `${attacker.name} used ${attack.name}! Dealt ${dmg} damage.${tag}`,
+      `${attacker.name} used ${attack.name}! Dealt ${finalDmg} damage.${tag}${gsTag}`,
       isPlayer ? 'player' : 'enemy'
     );
-    return Math.max(0, defender.currentHp - dmg);
+    return Math.max(0, defender.currentHp - finalDmg);
   }
 
   // ── Player picks an attack ────────────────────────────────────────────────
@@ -419,7 +431,7 @@ export default function CroganBattle() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="crogan-page">
+    <div className={`crogan-page${groundshaking ? ' groundshaking' : ''}`}>
 
       {/* Header */}
       <header className="crogan-header">

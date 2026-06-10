@@ -51,6 +51,14 @@ export function initiativeText(playerName, enemyName, r) {
   return `🎲 Initiative — ${playerName}: ${r.pRoll}+${r.pMod}=${r.pTotal}  vs  ${enemyName}: ${r.eRoll}+${r.eMod}=${r.eTotal}`;
 }
 
+// Groundshaking Attack — only legendary creatures can trigger this.
+// 20% chance per strike to deal 1.5× the normal damage.
+// Returns { triggered: boolean } — the caller applies the multiplier and visual effects.
+export function rollGroundshaking(attacker) {
+  if (!attacker.isLegendary) return { triggered: false };
+  return { triggered: Math.random() < 0.20 };
+}
+
 // Enemy AI: choose the attack that deals the most damage to the current defender.
 // 80% of the time it picks the optimal attack; 20% it picks randomly, so it still
 // feels like an opponent and not a solver. Returns one attack object.

@@ -53,8 +53,8 @@ export const DEV_MILESTONES = [
   },
   {
     id:          'ransack-event',
-    description: 'Someone ransacks the manor after 200 victories, hiding something in the chaos.',
-    trigger:     'battlesWon >= 200 AND NOT ransack-triggered',
+    description: 'Someone ransacks the manor after many victories, hiding something in the chaos.',
+    trigger:     'battlesWon >= 100 AND NOT ransack-triggered',
   },
   {
     id:          'final-letter',
@@ -146,7 +146,7 @@ export function checkMilestones() {
     ready.push('old-wren-appears');
   }
 
-  if (battlesWon >= 200 && !flags['ransack-triggered']) {
+  if (battlesWon >= 100 && !flags['ransack-triggered']) {
     ready.push('ransack-event');
   }
 

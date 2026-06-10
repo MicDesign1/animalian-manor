@@ -701,7 +701,7 @@ function DevConsole({ onClose }) {
       setBattles(50);
       ['mira-bully-quest-available','mira-bully-quest-started','mira-bully-quest-complete'].forEach(setFlag);
     }
-    if (scenario === 'ransack')       { setBattles(200); }
+    if (scenario === 'ransack')       { setBattles(100); }
     if (scenario === 'journal-all')   { setJournalPages(6); setJournalInput('6'); }
     if (scenario === 'coins') {
       const cur  = parseInt(localStorage.getItem(profileKey('coins')) || '0', 10);
@@ -804,7 +804,7 @@ function DevConsole({ onClose }) {
               Old Wren threshold (50 wins + Mira done)
             </button>
             <button className="dev-btn dev-btn--scenario" onClick={() => triggerScenario('ransack')}>
-              Ransack threshold (200 wins)
+              Ransack threshold (100 wins)
             </button>
             <button className="dev-btn dev-btn--scenario" onClick={() => triggerScenario('journal-all')}>
               Unlock all journal pages

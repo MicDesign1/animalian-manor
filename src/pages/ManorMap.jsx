@@ -656,16 +656,16 @@ export default function ManorMap() {
           <div className="arena-meter-track">
             <div
               className="arena-meter-fill"
-              style={{ width: `${Math.min(100, (battlesWon / 200) * 100)}%` }}
+              style={{ width: `${Math.min(100, (battlesWon / 100) * 100)}%` }}
             />
           </div>
           <span
-            className={`arena-meter-icon${battlesWon >= 150 ? ' arena-meter-icon--pulse' : ''}`}
+            className={`arena-meter-icon${battlesWon >= 75 ? ' arena-meter-icon--pulse' : ''}`}
             title="Something stirs..."
             aria-hidden="true"
           >🗝️</span>
         </div>
-        <span className="arena-meter-count">{battlesWon} / 200</span>
+        <span className="arena-meter-count">{battlesWon}</span>
       </div>
 
       {/* Room Info Tooltip (shown at bottom on hover) */}

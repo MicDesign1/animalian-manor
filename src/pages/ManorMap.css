@@ -711,7 +711,7 @@
 
 /* ══════════════════════════════════════════════════════════════════════════
    ARENA VICTORY METER
-   Sits between the map image and the bottom bar. Tracks wins toward 200.
+   Sits between the map image and the bottom bar. Tracks wins toward the Ransacking event.
    ══════════════════════════════════════════════════════════════════════════ */
 
 .arena-meter {
