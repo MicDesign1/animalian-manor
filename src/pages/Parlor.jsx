@@ -9,8 +9,37 @@ import './Parlor.css';
 
 // ── Mira's shop system ────────────────────────────────────────────────────────
 
-const SHOP_RESTOCK_MS = 20 * 60 * 1000; // 20 min after last card is bought
-const BUYBACK_LIMIT   = 8;              // max creatures on the buyback shelf
+const BUYBACK_LIMIT = 8; // max creatures on the buyback shelf
+
+// ── Playtime tracking ─────────────────────────────────────────────────────────
+// We track how many minutes the game has been open (playtime), not wall-clock
+// time. This means the shop refresh timer only counts down while the player
+// is actually playing — closing the tab pauses the clock.
+//
+// Two pieces of state:
+//   sessionStorage['session-start']         — Unix ms when this browser tab opened
+//   localStorage[profileKey('mira-playtime')] — accumulated minutes from past sessions
+//
+// We "checkpoint" (sync the two) on every shop visit so very little time is
+// lost if the tab is closed without visiting the shop.
+
+function getCurrentPlaytime() {
+  const base  = parseFloat(localStorage.getItem(profileKey('mira-playtime')) || '0');
+  const start = parseInt(sessionStorage.getItem('session-start') || '0', 10);
+  return start ? base + (Date.now() - start) / 60000 : base;
+}
+
+function checkpointPlaytime() {
+  // Save current total and reset the session start to now so future calls
+  // don't double-count the time we're about to save.
+  localStorage.setItem(profileKey('mira-playtime'), String(getCurrentPlaytime()));
+  sessionStorage.setItem('session-start', String(Date.now()));
+}
+
+// Returns a random refresh interval between 30 and 45 minutes of playtime.
+function randomRefreshInterval() {
+  return 30 + Math.random() * 15;
+}
 
 // Daily sell tracking — resets automatically each calendar day
 function getToday() { return new Date().toISOString().slice(0, 10); }
@@ -37,18 +66,19 @@ function msToLabel(ms) {
   return `${totalMin} min`;
 }
 
-// miraShop: { inventory, buyback, restockTime (ISO string|null), restocksToday, date, lastBaseIds }
+// miraShop: { inventory, buyback, nextRefreshPlaytime (float|null), restocksToday, date, lastBaseIds }
 function loadMiraShop() {
   const today = getToday();
-  const blank = { inventory: [], buyback: [], restockTime: null, restocksToday: 0, date: today, lastBaseIds: [] };
+  const blank = { inventory: [], buyback: [], nextRefreshPlaytime: null, restocksToday: 0, date: today, lastBaseIds: [] };
   try {
     const raw = localStorage.getItem(profileKey('mira-shop'));
     if (!raw) return blank;
-    const obj = JSON.parse(raw);
+    const { restockTime: _legacy, ...obj } = JSON.parse(raw); // drop old restockTime field
     // Reset daily restock count on a new day, keep inventory and buyback
-    return obj.date !== today
-      ? { ...blank, inventory: obj.inventory || [], buyback: obj.buyback || [], lastBaseIds: obj.lastBaseIds || [] }
-      : { ...blank, ...obj };
+    if (obj.date !== today) {
+      return { ...blank, inventory: obj.inventory || [], buyback: obj.buyback || [], lastBaseIds: obj.lastBaseIds || [], nextRefreshPlaytime: obj.nextRefreshPlaytime ?? null };
+    }
+    return { ...blank, ...obj, nextRefreshPlaytime: obj.nextRefreshPlaytime ?? null };
   } catch { return blank; }
 }
 function saveMiraShop(shop) {
@@ -855,6 +885,21 @@ function DevConsole({ onClose }) {
             </button>
 
             <button className="dev-btn dev-btn--scenario" onClick={() => {
+              const shop = loadMiraShop();
+              if (!shop.nextRefreshPlaytime) {
+                showDevToast("Visit Mira's Wares first to start the refresh timer.");
+                return;
+              }
+              // Push the playtime base past the next scheduled refresh so the
+              // next shop visit triggers a full refresh immediately.
+              localStorage.setItem(profileKey('mira-playtime'), String(shop.nextRefreshPlaytime + 0.1));
+              sessionStorage.setItem('session-start', String(Date.now()));
+              showDevToast("Playtime advanced — reopen Mira's Wares to see new stock!");
+            }}>
+              ⏩ Advance Mira Refresh
+            </button>
+
+            <button className="dev-btn dev-btn--scenario" onClick={() => {
               setStoryFlag('tutorial-complete', false);
               showDevToast('Tutorial reset — visit Manor Map to replay.');
             }}>
@@ -1168,29 +1213,41 @@ export default function Parlor() {
     setMiraQuestPhase(null);
     setDailySales(loadDailySales());
 
-    let shop = loadMiraShop();
+    // Checkpoint playtime so time is never lost between sessions
+    checkpointPlaytime();
+    const now  = getCurrentPlaytime();
+    let shop   = loadMiraShop();
 
-    // Check if the restock timer has elapsed while away
-    if (shop.inventory.length === 0 && shop.restockTime && Date.now() >= new Date(shop.restockTime).getTime()) {
-      const freshInv = generateInventory(collectionRef.current, shop.lastBaseIds);
-      shop = { ...shop, inventory: freshInv, restockTime: null, restocksToday: (shop.restocksToday || 0) + 1, lastBaseIds: freshInv.map(c => c.baseId) };
-      saveMiraShop(shop);
-      setMiraShop(shop);
-      setMiraQuip(pick(MIRA_QUIPS.restock));
-      return;
-    }
-
-    // First-ever visit OR no inventory and no timer — generate opening stock
-    if (shop.inventory.length === 0 && !shop.restockTime) {
-      const freshInv = generateInventory(collectionRef.current, shop.lastBaseIds);
-      shop = { ...shop, inventory: freshInv, lastBaseIds: freshInv.map(c => c.baseId) };
+    // ── First ever visit — no refresh scheduled yet ───────────────────────
+    if (shop.nextRefreshPlaytime === null) {
+      const freshInv            = generateInventory(collectionRef.current, shop.lastBaseIds);
+      const nextRefreshPlaytime = now + randomRefreshInterval();
+      shop = { ...shop, inventory: freshInv, nextRefreshPlaytime, lastBaseIds: freshInv.map(c => c.baseId) };
       saveMiraShop(shop);
       setMiraShop(shop);
       setMiraQuip(pick(MIRA_QUIPS.fresh));
       return;
     }
 
-    // Re-entering with existing inventory
+    // ── Playtime refresh due — natural shop turnover ───────────────────────
+    if (now >= shop.nextRefreshPlaytime) {
+      // Keep 1–2 creatures from the previous stock so there's some continuity
+      const keepCount = shop.inventory.length > 0 ? (Math.floor(Math.random() * 2) + 1) : 0;
+      const kept      = [...shop.inventory].sort(() => Math.random() - 0.5).slice(0, keepCount);
+      const keptIds   = kept.map(c => c.baseId);
+      // Fill the remaining slots with fresh creatures (excluding the kept ones)
+      const newItems  = generateInventory(collectionRef.current, [...(shop.lastBaseIds || []), ...keptIds])
+                          .slice(0, 5 - kept.length);
+      const freshInv            = [...kept, ...newItems];
+      const nextRefreshPlaytime = now + randomRefreshInterval();
+      shop = { ...shop, inventory: freshInv, nextRefreshPlaytime, restocksToday: (shop.restocksToday || 0) + 1, lastBaseIds: freshInv.map(c => c.baseId) };
+      saveMiraShop(shop);
+      setMiraShop(shop);
+      setMiraQuip(pick(MIRA_QUIPS.restock));
+      return;
+    }
+
+    // ── Re-entering before refresh — load existing stock ──────────────────
     setMiraShop(shop);
     if (shop.inventory.length > 0 && shop.buyback.length > 0)  setMiraQuip(pick(MIRA_QUIPS.bothSides));
     else if (shop.inventory.length > 0)                        setMiraQuip(pick(shop.restocksToday > 0 ? MIRA_QUIPS.restock : MIRA_QUIPS.existing));
@@ -1198,8 +1255,10 @@ export default function Parlor() {
     else                                                        setMiraQuip(pick(MIRA_QUIPS.empty));
   }, [activeZone]); // eslint-disable-line
 
-  // Computed restock countdown
-  const msLeft    = miraShop.restockTime ? Math.max(0, new Date(miraShop.restockTime).getTime() - Date.now()) : 0;
+  // Countdown shown only when the shop is empty — converts remaining playtime to ms
+  const msLeft    = (miraShop.inventory.length === 0 && miraShop.nextRefreshPlaytime)
+    ? Math.max(0, (miraShop.nextRefreshPlaytime - getCurrentPlaytime()) * 60000)
+    : 0;
   const timeLabel = msToLabel(msLeft);
 
   // Mira's active quip: commentary on selected card overrides the static quip
@@ -1226,11 +1285,9 @@ export default function Parlor() {
     saveCollection([...collection, { ...creature, id: `bought-${Date.now()}` }]);
     if (selectedCard?.id === creature.id) setSelectedCard(null);
 
-    const remaining = miraShop.inventory.filter(c => c.id !== creature.id);
-    const restockTime = remaining.length === 0
-      ? new Date(Date.now() + SHOP_RESTOCK_MS).toISOString() // all bought → start timer
-      : miraShop.restockTime;
-    const updatedShop = { ...miraShop, inventory: remaining, restockTime };
+    const remaining   = miraShop.inventory.filter(c => c.id !== creature.id);
+    // nextRefreshPlaytime is unchanged — the playtime clock schedules the next refresh
+    const updatedShop = { ...miraShop, inventory: remaining };
     saveMiraShop(updatedShop);
     setMiraShop(updatedShop);
 
