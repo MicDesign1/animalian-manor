@@ -9,7 +9,9 @@
       "Bash(mkdir -p \"d:\\\\KID GAME\\\\project\\\\animalian-manor\\\\src\\\\audio\" 2>/dev/null; echo \"done\")",
       "Bash(ls public/sounds/)",
       "Bash(ls public/Sounds/)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(git stash *)",
+      "Bash(npx eslint *)"
     ],
     "additionalDirectories": [
       "d:\\KID GAME\\project\\animalian-manor\\src",

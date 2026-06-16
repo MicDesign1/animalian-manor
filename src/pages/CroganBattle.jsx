@@ -8,7 +8,7 @@ import { setStoryFlag, setJournalPages } from '../data/gameProgress';
 import { getRandomImage } from '../data/creatureImages';
 import { LEGENDARY_ART_PATHS, isReservedArt } from '../data/reservedArt';
 import AudioManager from '../audio/AudioManager';
-import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack, rollGroundshaking } from '../data/combat';
+import { getMultiplier, calcDamage, isStrongAttack, rollInitiative, initiativeText, chooseBestAttack, rollGroundshaking, ensurePlayableAttack } from '../data/combat';
 import InitiativeBanner from '../components/InitiativeBanner';
 import './CroganBattle.css';
 import './Arena.css';
@@ -168,6 +168,18 @@ export default function CroganBattle() {
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [log]);
+
+  // Deadlock guard: if every attack landed on cooldown at once, free the
+  // least-locked one the moment the player's turn begins.
+  useEffect(() => {
+    if (isPlayerTurn && !busy && phase === 'battling' && b.current) {
+      const fixed = ensurePlayableAttack(b.current.cooldowns);
+      if (fixed !== b.current.cooldowns) {
+        b.current.cooldowns = fixed;
+        setPlayerCooldowns([...fixed]);
+      }
+    }
+  }, [isPlayerTurn, busy, phase]);
 
   function addLog(text, type = 'info') {
     setLog(prev => [...prev, { text, type }]);

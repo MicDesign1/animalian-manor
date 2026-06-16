@@ -78,3 +78,25 @@ export function chooseBestAttack(attacker, defender) {
   }
   return best;
 }
+
+// Deadlock guard — cooldowns are tracked as a per-slot array parallel to a
+// creature's attacks (e.g. b.current.cooldowns / playerCooldowns: [0, 0]).
+// If both slots land on cooldown at the same time (common when two attacks
+// share the same cooldown value), there would be no selectable move and the
+// turn could never resolve. Call this right before attacks are presented for
+// selection / before the turn resolves. If at least one attack is already
+// available, the array is returned untouched. Otherwise the attack with the
+// lowest remaining cooldown is freed (ties go to the first attack), so there
+// is always at least one playable move.
+export function ensurePlayableAttack(cooldowns) {
+  if (!cooldowns || cooldowns.length === 0) return cooldowns;
+  if (cooldowns.some(cd => cd <= 0)) return cooldowns;
+
+  let lowestIdx = 0;
+  for (let i = 1; i < cooldowns.length; i++) {
+    if (cooldowns[i] < cooldowns[lowestIdx]) lowestIdx = i;
+  }
+  const fixed = [...cooldowns];
+  fixed[lowestIdx] = 0;
+  return fixed;
+}
